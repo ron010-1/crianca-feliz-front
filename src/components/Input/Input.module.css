@@ -1,0 +1,21 @@
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  border-color: #555ab9;
+  box-shadow: 0 0 0 2px rgba(85, 90, 185, 0.25);
+}
+
+.input::placeholder {
+  color: #999;
+}
