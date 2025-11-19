@@ -4,11 +4,12 @@ import { MdOutlineClose } from "react-icons/md";
 interface ExcludeModalProps {
   open: boolean;
   onClose: () => void;
-  mensagem?: string;
   onExclude: () => void;
+  loading?: boolean;
+  message?: string;
 }
 
-const ExcludeModal = ({ open, onClose, mensagem, onExclude }: ExcludeModalProps) => {
+const ExcludeModal = ({ open, onClose, message, onExclude, loading = false }: ExcludeModalProps) => {
   if (!open) return null;
 
   return (
@@ -20,14 +21,12 @@ const ExcludeModal = ({ open, onClose, mensagem, onExclude }: ExcludeModalProps)
         </div>
 
         <div className="content-modal">
-          <p className="message-modal">
-            {mensagem || "Confirme no botão abaixo que você deseja excluir este registro"}
-          </p>
+          <p className="message-modal">{message || "Confirme no botão abaixo que você deseja excluir este registro"}</p>
         </div>
 
         <div className="actions-modal">
-          <button className="btn-base btn-exclude" onClick={onExclude}>
-            Excluir
+          <button className="btn-base btn-exclude" onClick={onExclude} disabled={loading}>
+            {loading ? "Excluindo..." : "Excluir"}
           </button>
           <button className="btn-base btn-cancel" onClick={onClose}>
             Cancelar

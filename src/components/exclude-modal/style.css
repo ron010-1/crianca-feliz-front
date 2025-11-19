@@ -14,7 +14,7 @@
 .modal {
   border-radius: 5px;
   overflow: hidden;
-  max-width: 500px;
+  width: 500px;
   background: #ffff;
   color: black;
 }
@@ -61,6 +61,7 @@
 .btn-base {
   padding: 10px;
   border-radius: 5px;
+  transition: all 0.3s ease;
 }
 
 .btn-cancel {
