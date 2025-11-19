@@ -1,0 +1,29 @@
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+
+  th {
+    background: #e0f2fe;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+
+  th,
+  .row-colum {
+    padding: 8px;
+    color: black;
+  }
+}
+
+.table-row:nth-child(even) {
+  background-color: #f7f7f7;
+}
+
+.table-row:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.row-colum {
+  border-bottom: 1px solid #ddd;
+}
