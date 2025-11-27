@@ -32,6 +32,5 @@ function App() {
       <ExcludeModal open={open} onClose={handleClose} onExclude={handleExclude} loading={loading} message="exluir?" />
     </>
   );
-}
 
 export default App;
