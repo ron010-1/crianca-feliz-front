@@ -1,0 +1,27 @@
+.actions-table {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-actions {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.icon-delete {
+  color: #ef4444;
+}
+
+.icon-edit {
+  color: #64748b;
+}
+
+.icon-map {
+  color: #3b82f6;
+}
