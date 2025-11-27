@@ -4,9 +4,10 @@ import './index.css'
 import App from './App.tsx'
 import LoginAdmin from './pages/LoginAdmin/index.tsx'
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <App />
     <LoginAdmin />
   </StrictMode>,
-)
+);
+
