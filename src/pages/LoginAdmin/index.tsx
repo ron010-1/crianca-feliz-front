@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Input from "../../components/Input";
+import Input from "../../components/Input/Input";
 import { Button } from "../../stories/Button";
 import Style from "./login.module.css";
 
