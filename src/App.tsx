@@ -1,30 +1,10 @@
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 import TabelaBeneficiarios from "./components/tabela-beneficiarios/TabelaBeneficiarios";
-import { useEffect, useState } from "react";
 import type { BeneficiarioType } from "./models/beneficiario";
+import CustomViewMap from "./components/custom-map/CustomViewMap";
 
 function App() {
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const simularAPI = async () => {
-    setLoading(true);
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setLoading(false);
-        resolve();
-      }, 2000);
-    });
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await simularAPI();
-    };
-
-    fetchData();
-  }, []);
-
   const beneficiariosMock: BeneficiarioType[] = [
     {
       id: 1,
@@ -71,12 +51,27 @@ function App() {
     },
   ];
 
+  const pessoa = {
+    nome: "Diego Sousa",
+    coordenadas: [-7.118, -34.873],
+  };
+  const center = pessoa.coordenadas;
+  const markers = [
+    {
+      localizacao: pessoa.coordenadas,
+    },
+  ];
+
   return (
     <>
-      <ToastContainer theme="colored" />
+      {/* <ToastContainer theme="colored" />
       <span>Hello World!</span>
-      <TabelaBeneficiarios beneficiarios={beneficiariosMock} loading={loading} />
+      <TabelaBeneficiarios beneficiarios={beneficiariosMock} /> */}
+      <div style={{ height: "500px", width: "700px" }}>
+        <CustomViewMap center={center} markers={markers} />
+      </div>
     </>
   );
+}
 
 export default App;

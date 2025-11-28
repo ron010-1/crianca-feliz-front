@@ -9,15 +9,10 @@ import type { BeneficiarioType } from "../../models/beneficiario";
 
 interface TabelaBeneficiarios {
   beneficiarios: BeneficiarioType[];
-  loading: boolean;
 }
 
-const TabelaBeneficiarios = ({ beneficiarios, loading }: TabelaBeneficiarios) => {
+const TabelaBeneficiarios = ({ beneficiarios }: TabelaBeneficiarios) => {
   const { handleClose, handleExclude, open, loadingModal, handleOpen } = useTabelaBeneficiarios();
-
-  if (loading) {
-    return <span>Carregando...</span>;
-  }
 
   return (
     <>
