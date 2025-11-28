@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Input from "../../components/Input/Input";
-import { Button } from "../../stories/Button";
 import Style from "./login.module.css";
 
 export default function LoginAdmin() {
@@ -28,10 +27,10 @@ export default function LoginAdmin() {
       />
 
       <div className={Style.buttonWrapper}>
-        <Button 
-        label="Entrar" 
-        backgroundColor="#07ce2f5f" 
-        />
+        <button>
+          Entrar
+        </button>
+        
       </div>
     </div>
   );

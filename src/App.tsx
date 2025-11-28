@@ -78,5 +78,6 @@ function App() {
       <TabelaBeneficiarios beneficiarios={beneficiariosMock} loading={loading} />
     </>
   );
-
+  
+}
 export default App;
