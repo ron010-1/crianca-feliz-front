@@ -6,13 +6,24 @@ import "./style.css";
 import ExcludeModal from "../exclude-modal/ExcludeModal";
 import { useTabelaBeneficiarios } from "./use-tabela-beneficiarios";
 import type { BeneficiarioType } from "../../models/beneficiario";
+import ViewMapModal from "../view-map-modal/ViewMapModal";
 
 interface TabelaBeneficiarios {
   beneficiarios: BeneficiarioType[];
 }
 
 const TabelaBeneficiarios = ({ beneficiarios }: TabelaBeneficiarios) => {
-  const { handleClose, handleExclude, open, loadingModal, handleOpen } = useTabelaBeneficiarios();
+  const {
+    handleCloseExcludeModal,
+    handleExclude,
+    openExcludeModal,
+    loadingModal,
+    handleOpenExcludeModal,
+    handleOpenMapModal,
+    handleCloseMapModal,
+    openMapModal,
+    beneficiario,
+  } = useTabelaBeneficiarios();
 
   return (
     <>
@@ -28,12 +39,20 @@ const TabelaBeneficiarios = ({ beneficiarios }: TabelaBeneficiarios) => {
             { name: "Telefone 2", accessor: (row) => row.telefone2 },
             {
               name: "Ações",
-              accessor: () => {
+              accessor: (row) => {
                 return (
                   <div className="actions-table">
-                    <FaMapLocationDot className="icon-actions icon-map" title="Acessar localização" />
+                    <FaMapLocationDot
+                      className="icon-actions icon-map"
+                      title="Acessar localização"
+                      onClick={() => handleOpenMapModal(row)}
+                    />
                     <FaUserEdit className="icon-actions icon-edit" title="Editar beneficiario" />
-                    <MdDelete className="icon-actions icon-delete" title="Deletar beneficiario" onClick={handleOpen} />
+                    <MdDelete
+                      className="icon-actions icon-delete"
+                      title="Deletar beneficiario"
+                      onClick={handleOpenExcludeModal}
+                    />
                   </div>
                 );
               },
@@ -44,7 +63,13 @@ const TabelaBeneficiarios = ({ beneficiarios }: TabelaBeneficiarios) => {
         <span>Nenhum beneficiario cadastrado</span>
       )}
 
-      <ExcludeModal open={open} onClose={handleClose} onExclude={handleExclude} loading={loadingModal} />
+      <ExcludeModal
+        open={openExcludeModal}
+        onClose={handleCloseExcludeModal}
+        onExclude={handleExclude}
+        loading={loadingModal}
+      />
+      <ViewMapModal open={openMapModal} onClose={handleCloseMapModal} beneficiario={beneficiario!} />
     </>
   );
 };

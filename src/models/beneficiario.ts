@@ -3,7 +3,7 @@ export type BeneficiarioType = {
   name: string;
   responsavel: string;
   dataNascimento: string;
-  location: string;
+  location: number[];
   telefone1: string;
   telefone2?: string;
 };
