@@ -3,7 +3,6 @@ import Input from "../../components/Input/Input";
 import Style from "./login.module.css";
 
 export default function LoginAdmin() {
-
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -13,24 +12,15 @@ export default function LoginAdmin() {
 
   return (
     <div className={Style.forms}>
-      <Input 
-        value={name}
-        onChange={setName}
-        placeholder="Nome"
-      />
+      <Input value={name} onChange={setName} placeholder="Nome" />
 
-      <Input 
-        value={password}
-        onChange={setPassword}
-        placeholder="Senha"
-        type="password"
-      />
+      <Input value={password} onChange={setPassword} placeholder="Senha" type="password" />
 
       <div className={Style.buttonWrapper}>
+        <button style={{ backgroundColor: "#07ce2f5f" }}>Entrar</button>
         <button>
           Entrar
         </button>
-        
       </div>
     </div>
   );

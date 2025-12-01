@@ -1,37 +1,16 @@
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 import TabelaBeneficiarios from "./components/tabela-beneficiarios/TabelaBeneficiarios";
-import { useEffect, useState } from "react";
 import type { BeneficiarioType } from "./models/beneficiario";
 
 function App() {
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const simularAPI = async () => {
-    setLoading(true);
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setLoading(false);
-        resolve();
-      }, 2000);
-    });
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await simularAPI();
-    };
-
-    fetchData();
-  }, []);
-
   const beneficiariosMock: BeneficiarioType[] = [
     {
       id: 1,
       name: "Ana Clara Ferreira",
       responsavel: "João Ferreira",
       dataNascimento: "12/07/2010",
-      location: "Rua das Flores, 120 - João Pessoa",
+      location: [-7.119495, -34.845011],
       telefone1: "(83) 99111-2233",
       telefone2: "(83) 98822-4455",
     },
@@ -40,7 +19,7 @@ function App() {
       name: "Carlos Eduardo Santos",
       responsavel: "Mariana Santos",
       dataNascimento: "03/02/2015",
-      location: "Av. Principal, 450 - Cabedelo",
+      location: [-7.00085, -34.833001],
       telefone1: "(83) 99777-8899",
     },
     {
@@ -48,7 +27,7 @@ function App() {
       name: "Beatriz Moura",
       responsavel: "Silvia Moura",
       dataNascimento: "25/11/2008",
-      location: "Rua das Acácias, 85 - Santa Rita",
+      location: [-7.135725, -34.97521],
       telefone1: "(83) 98444-5566",
       telefone2: "(83) 98123-9876",
     },
@@ -57,7 +36,7 @@ function App() {
       name: "Lucas Henrique Alves",
       responsavel: "Pedro Alves",
       dataNascimento: "09/05/2012",
-      location: "Rua Projetada, 300 - Bayeux",
+      location: [-7.12543, -34.9325],
       telefone1: "(83) 99666-5544",
     },
     {
@@ -65,7 +44,7 @@ function App() {
       name: "Maria Eduarda Lima",
       responsavel: "Juliana Lima",
       dataNascimento: "18/01/2014",
-      location: "Rua da Mata, 42 - João Pessoa",
+      location: [-7.11532, -34.86145],
       telefone1: "(83) 99912-3322",
       telefone2: "(83) 98765-1122",
     },
@@ -75,9 +54,9 @@ function App() {
     <>
       <ToastContainer theme="colored" />
       <span>Hello World!</span>
-      <TabelaBeneficiarios beneficiarios={beneficiariosMock} loading={loading} />
+      <TabelaBeneficiarios beneficiarios={beneficiariosMock} />
     </>
   );
-  
 }
+
 export default App;

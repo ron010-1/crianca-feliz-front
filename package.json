@@ -12,8 +12,11 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "react-dom": "^19.2.0",
+    "leaflet": "^1.9.4",
+    "react": "^19.0.0-rc.1",
+    "react-dom": "^19.0.0-rc.1",
     "react-icons": "^5.5.0",
+    "react-leaflet": "^5.0.0",
     "react-toastify": "^11.0.5"
   },
   "devDependencies": {
@@ -24,6 +27,7 @@
     "@storybook/addon-onboarding": "^10.0.8",
     "@storybook/addon-vitest": "^10.0.8",
     "@storybook/react-vite": "^10.0.8",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
