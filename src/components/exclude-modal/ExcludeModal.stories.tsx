@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import ExcludeModal from "./ExcludeModal";
 
 const meta: Meta<typeof ExcludeModal> = {
