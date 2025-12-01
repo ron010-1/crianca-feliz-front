@@ -1,7 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";                                                    
 import CustomTable from "./CustomTable";
 
-// --- Tipo usado nos stories ---
 type User = {
   id: number;
   name: string;
@@ -14,7 +13,6 @@ const sampleData: User[] = [
   { id: 3, name: "Carlos", age: 27 },
 ];
 
-// --- Wrapper para fixar o tipo genérico ---
 const TableUser = (props: React.ComponentProps<typeof CustomTable<User>>) => (
   <CustomTable<User> {...props} />
 );
@@ -35,7 +33,6 @@ const meta: Meta<typeof TableUser> = {
 export default meta;
 type Story = StoryObj<typeof TableUser>;
 
-// ---------------- Stories ----------------
 
 export const Default: Story = {};
 
