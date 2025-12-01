@@ -18,6 +18,9 @@ export default function LoginAdmin() {
 
       <div className={Style.buttonWrapper}>
         <button style={{ backgroundColor: "#07ce2f5f" }}>Entrar</button>
+        <button>
+          Entrar
+        </button>
       </div>
     </div>
   );
