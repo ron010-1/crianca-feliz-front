@@ -4,9 +4,8 @@ import Style from "./login.module.css";
 import Button from "../../components/button/Button";
 
 export default function LoginAdmin() {
-  const [name, setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [errors, setErrors] = useState({
     email: "",
     password: "",
@@ -16,68 +15,60 @@ export default function LoginAdmin() {
     document.title = "Admin Login";
   }, []);
 
+  useEffect(() => {
+    validateForm();
+  }, [email, password]);
+
   const validateForm = () => {
     const newErrors = { email: "", password: "" };
 
-    if (!name.trim()){
-      newErrors.email = "O email é obrigatório."
-    };
+    if (!email.trim()) {
+      newErrors.email = "O email é obrigatório.";
+    } else if (!email.includes("@")) {
+      newErrors.email = "Digite um email válido.";
+    }
 
-    if (name && !name.includes("@")){
-      newErrors.email = "Digite um email válido."
-    };
-
-    if (!password.trim()){ 
-      newErrors.password = "A senha é obrigatória."
-    };
-
-    if (password && !/[A-Z]/.test(password)){
-      newErrors.password = "A senha deve conter ao menos 1 letra maiúscula."
-      };
+    if (!password.trim()) {
+      newErrors.password = "A senha é obrigatória.";
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = "A senha deve conter ao menos 1 letra maiúscula.";
+    }
 
     setErrors(newErrors);
-
     return !newErrors.email && !newErrors.password;
   };
 
-  const clearInputs = () =>{
+  const clearInputs = () => {
     setEmail("");
     setPassword("");
-  }
-  const handleSubmit = () => {
-    if (validateForm()) {
-      alert("Login válido — execute aqui a lógica de login");
-    }
-    clearInputs();
   };
 
-  const isFormValid = name && password && !errors.email && !errors.password;
+  const handleSubmit = () => {
+    if (validateForm()) {
+      alert("Login válido");
+      clearInputs();
+    }
+  };
+
+  const isFormValid = email && password && !errors.email && !errors.password;
 
   return (
     <div className={Style.forms}>
       <Input
-        value={name}
-        onChange={(v) => {
-          setEmail(v);
-          if (errors.email) validateForm();
-        }}
+        value={email}
+        onChange={(v) => setEmail(v)}
         placeholder="Email"
         type="email"
       />
-      {errors.email && (
-        <p className={Style.error}>{errors.email}</p>
-      )}
+      {errors.email && <p className={Style.error}>{errors.email}</p>}
 
       <Input
-        value={password} placeholder="Senha" type="password"
-        onChange={(v) => {
-          setPassword(v);
-          if (errors.password) validateForm();
-        }} 
-        />
-        {errors.password && (
-        <p className={Style.error}>{errors.password}</p>
-      )}
+        value={password}
+        placeholder="Senha"
+        type="password"
+        onChange={(v) => setPassword(v)}
+      />
+      {errors.password && <p className={Style.error}>{errors.password}</p>}
 
       <div className={Style.buttonWrapper}>
         <Button
