@@ -19,7 +19,7 @@ const ViewMapModal = ({ open, onClose, beneficiario }: ViewMapModalProps) => {
       <div className="view-modal">
         <div className="view-header-modal">
           <span className="view-title-modal">
-            Localizacao do beneficiário <strong>{beneficiario.name}</strong>
+            Localização do beneficiário(a) <strong>{beneficiario.name}</strong>
           </span>
           <MdOutlineClose onClick={onClose} className="icon-close" title="Fechar" />
         </div>
