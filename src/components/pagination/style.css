@@ -1,0 +1,27 @@
+.container-pagination {
+  display: flex;
+  align-items: center;
+  gap: 5rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.page-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-now {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #aaa;
+}

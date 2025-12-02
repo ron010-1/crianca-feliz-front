@@ -1,0 +1,75 @@
+.container-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  color: #6c757d;
+}
+
+.container-empty-with-background {
+  background-color: #fcfcfc;
+  border: 1px dashed #d0d0d0;
+  border-radius: 8px;
+}
+
+.empty-icon {
+  color: #b0b0b0;
+  margin-bottom: 15px;
+}
+
+.message-empty {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 5px;
+}
+
+.subtext-empty {
+  color: #888;
+  margin-top: 5px;
+  max-width: 80%;
+}
+
+.container-sm {
+  padding: 30px 15px;
+  margin-top: 15px;
+}
+.icon-sm {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+.message-sm {
+  font-size: 1rem;
+}
+.subtext-sm {
+  font-size: 0.85rem;
+}
+
+.container-md {
+  padding: 50px 20px;
+  margin-top: 30px;
+}
+.icon-md {
+  font-size: 3.5rem;
+}
+.message-md {
+  font-size: 1.2rem;
+}
+.subtext-md {
+  font-size: 0.9rem;
+}
+
+.container-lg {
+  padding: 70px 30px;
+  margin-top: 40px;
+}
+.icon-lg {
+  font-size: 5rem;
+}
+.message-lg {
+  font-size: 1.5rem;
+}
+.subtext-lg {
+  font-size: 1rem;
+}

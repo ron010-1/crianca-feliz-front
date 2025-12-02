@@ -2,59 +2,45 @@ import "./App.css";
 import { ToastContainer } from "react-toastify";
 import TabelaBeneficiarios from "./components/tabela-beneficiarios/TabelaBeneficiarios";
 import type { BeneficiarioType } from "./models/beneficiario";
+import beneficiarios from "./mocks/beneficiarios.json";
+import { useMemo, useState } from "react";
+import type { PaginationType } from "./models/global";
 
 function App() {
-  const beneficiariosMock: BeneficiarioType[] = [
-    {
-      id: 1,
-      name: "Ana Clara Ferreira",
-      responsavel: "João Ferreira",
-      dataNascimento: "12/07/2010",
-      location: [-7.119495, -34.845011],
-      telefone1: "(83) 99111-2233",
-      telefone2: "(83) 98822-4455",
-    },
-    {
-      id: 2,
-      name: "Carlos Eduardo Santos",
-      responsavel: "Mariana Santos",
-      dataNascimento: "03/02/2015",
-      location: [-7.00085, -34.833001],
-      telefone1: "(83) 99777-8899",
-    },
-    {
-      id: 3,
-      name: "Beatriz Moura",
-      responsavel: "Silvia Moura",
-      dataNascimento: "25/11/2008",
-      location: [-7.135725, -34.97521],
-      telefone1: "(83) 98444-5566",
-      telefone2: "(83) 98123-9876",
-    },
-    {
-      id: 4,
-      name: "Lucas Henrique Alves",
-      responsavel: "Pedro Alves",
-      dataNascimento: "09/05/2012",
-      location: [-7.12543, -34.9325],
-      telefone1: "(83) 99666-5544",
-    },
-    {
-      id: 5,
-      name: "Maria Eduarda Lima",
-      responsavel: "Juliana Lima",
-      dataNascimento: "18/01/2014",
-      location: [-7.11532, -34.86145],
-      telefone1: "(83) 99912-3322",
-      telefone2: "(83) 98765-1122",
-    },
-  ];
+  const [pagination, setPagination] = useState<PaginationType>({
+    page: 1,
+    limit: 5,
+    totalItens: beneficiarios.length,
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const beneficiariosMock: BeneficiarioType[] = useMemo(() => {
+    const startIndex = (pagination.page - 1) * pagination.limit;
+    const endIndex = startIndex + pagination.limit;
+
+    return beneficiarios.slice(startIndex, endIndex) as BeneficiarioType[];
+  }, [pagination]);
+
+  const handlePageBeneficiarios = async (page: number) => {
+    setLoading(true);
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        setLoading(false);
+        resolve();
+      }, 2000);
+    });
+    setPagination((prev) => ({ ...prev, page }));
+  };
 
   return (
     <>
       <ToastContainer theme="colored" />
       <span>Hello World!</span>
-      <TabelaBeneficiarios beneficiarios={beneficiariosMock} />
+      <TabelaBeneficiarios
+        loading={loading}
+        beneficiarios={beneficiariosMock}
+        paginationDetails={{ pagination, handlePageBeneficiarios }}
+      />
     </>
   );
 }
