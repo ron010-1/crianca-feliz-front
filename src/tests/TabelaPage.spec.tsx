@@ -1,5 +1,6 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, test, expect, vi } from "vitest";
 import App from "../App"; 
 
 vi.mock('react-leaflet', () => ({
@@ -9,13 +10,14 @@ vi.mock('react-leaflet', () => ({
 }));
 
 describe("Tela de Listagem de Beneficiários", () => {
-    
-    
-    it("deve navegar entre páginas e mostrar loading", async () => {
+    test("deve navegar entre páginas e mostrar loading", async () => {
         render(<App />);
-        fireEvent.click(screen.getByText("Próxima"));
+        
+        const btnProxima = screen.getByRole("button", { name: "Próxima" });
+        await userEvent.click(btnProxima);
+        
         await screen.findByText(/carregando/i);
+        
         await waitFor(() => expect(screen.queryByText(/carregando/i)).not.toBeInTheDocument(), { timeout: 4000 });
     });
- 
 });
