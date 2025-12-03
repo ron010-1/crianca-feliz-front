@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import TabelaBeneficiarios from "./TabelaBeneficiarios";
 
-
 vi.mock('react-leaflet', () => ({
   MapContainer: () => <div>Mapa Mock</div>,
   TileLayer: () => <div>Layer Mock</div>,
@@ -23,7 +22,8 @@ const dadosMock = [{
   responsavel: "João",
   dataNascimento: "12/07/2010",
   location: [-7.11, -34.84],
-  telefone1: "99999999"
+  telefone1: "(83) 99999-8888",
+  telefone2: "(83) 3333-3333"
 }];
 
 describe("Componente TabelaBeneficiarios", () => {
@@ -56,7 +56,48 @@ describe("Componente TabelaBeneficiarios", () => {
     );
 
     expect(screen.getByText("Ana Clara")).toBeInTheDocument();
-    
     expect(screen.getByTitle("Acessar localização")).toBeInTheDocument();
+  });
+
+  it("deve renderizar colunas de dados específicos como telefone corretamente", () => {
+    render(
+        <TabelaBeneficiarios 
+            beneficiarios={dadosMock} 
+            loading={false}
+        />
+    );
+
+    expect(screen.getByText("(83) 99999-8888")).toBeInTheDocument();
+    expect(screen.getByText("(83) 3333-3333")).toBeInTheDocument();
+  });
+
+  it("deve renderizar a seção de paginação se os detalhes forem fornecidos e houver dados", () => {
+    const mockPagination = {
+        pagination: { page: 1, limit: 5, totalItens: 20 },
+        handlePageBeneficiarios: vi.fn()
+    };
+
+    render(
+        <TabelaBeneficiarios 
+            beneficiarios={dadosMock} 
+            loading={false}
+            paginationDetails={mockPagination}
+        />
+    );
+
+    expect(screen.getByText("Próxima")).toBeInTheDocument();
+    expect(screen.getByText("de 4")).toBeInTheDocument();
+  });
+
+  it("não deve renderizar a paginação se paginationDetails for undefined", () => {
+    render(
+        <TabelaBeneficiarios 
+            beneficiarios={dadosMock} 
+            loading={false}
+            paginationDetails={undefined}
+        />
+    );
+
+    expect(screen.queryByText("Próxima")).not.toBeInTheDocument();
   });
 });
