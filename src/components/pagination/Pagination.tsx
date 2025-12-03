@@ -5,10 +5,10 @@ import Button from "../button/Button";
 
 interface PaginationProps {
   pagination: PaginationType;
-  handleItens: (page: number) => void;
+  onPageChange: (page: number) => void;
 }
 
-const Pagination = ({ pagination: { page, limit, totalItens }, handleItens }: PaginationProps) => {
+const Pagination = ({ pagination: { page, limit, totalItens }, onPageChange }: PaginationProps) => {
   const { totalPages, isShow } = useMemo(() => {
     const isShow = totalItens > limit;
     const totalPages = Math.ceil(totalItens / limit);
@@ -23,18 +23,19 @@ const Pagination = ({ pagination: { page, limit, totalItens }, handleItens }: Pa
   return (
     <div className="container-pagination">
       <div className="pagination">
-        <Button label="Anterior" disabled={page <= 1} variant="secondary" onClick={() => handleItens(page - 1)} />
+        <Button label="Anterior" disabled={page <= 1} variant="secondary" onClick={() => onPageChange(page - 1)} />
 
         <div className="page-info">
-          <span className="page-now">{page}</span>
-          <span className="total">de {totalPages}</span>
+          <span>
+            {page} de {totalPages}
+          </span>
         </div>
 
         <Button
           label="Próxima"
           disabled={page >= totalPages}
           variant="secondary"
-          onClick={() => handleItens(page + 1)}
+          onClick={() => onPageChange(page + 1)}
         />
       </div>
     </div>

@@ -1,20 +1,38 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import Pagination from "./Pagination";
+import { useState } from "react";
 
 const meta: Meta<typeof Pagination> = {
   title: "Components/Pagination",
   component: Pagination,
+  render: (args) => {
+    const Wrapper = () => {
+      const [page, setPage] = useState(args.pagination.page);
+
+      return (
+        <Pagination
+          {...args}
+          pagination={{
+            ...args.pagination,
+            page,
+          }}
+          onPageChange={(newPage: number) => setPage(newPage)}
+        />
+      );
+    };
+
+    return <Wrapper />;
+  },
   args: {
     pagination: {
       page: 1,
       limit: 10,
       totalItens: 100,
     },
-    handleItens: (page: number) => alert(`Navegando para a página: ${page}`),
   },
   argTypes: {
     pagination: { control: "object" },
-    handleItens: { action: "page changed" },
+    onPageChange: { action: "page changed" },
   },
   tags: ["autodocs"],
 };

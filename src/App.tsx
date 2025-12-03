@@ -39,7 +39,7 @@ function App() {
       <TabelaBeneficiarios
         loading={loading}
         beneficiarios={beneficiariosMock}
-        paginationDetails={{ pagination, handlePageBeneficiarios }}
+        paginationDetails={{ pagination, onPageChange: handlePageBeneficiarios }}
       />
     </>
   );

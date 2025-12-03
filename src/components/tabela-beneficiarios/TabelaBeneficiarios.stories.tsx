@@ -17,7 +17,7 @@ const meta: Meta<typeof TabelaBeneficiarios> = {
         limit: 10,
         totalItens: mockBeneficiarios.length,
       },
-      handlePageBeneficiarios: (page) => alert(`Navegando para a página: ${page}`),
+      onPageChange: (page) => alert(`Navegando para a página: ${page}`),
     },
   },
   argTypes: {
@@ -44,7 +44,7 @@ export const Default: Story = {
         limit: 10,
         totalItens: mockBeneficiarios.length,
       },
-      handlePageBeneficiarios: (page) => console.log(`Ir para página: ${page}`),
+      onPageChange: (page) => console.log(`Ir para página: ${page}`),
     },
   },
 };
@@ -82,7 +82,7 @@ export const MiddlePage: Story = {
         limit: 10,
         totalItens: 25,
       },
-      handlePageBeneficiarios: (page) => console.log(`Ir para página: ${page}`),
+      onPageChange: (page) => console.log(`Ir para página: ${page}`),
     },
   },
 };
@@ -99,7 +99,7 @@ export const PaginationDisabled: Story = {
         limit: 10,
         totalItens: 5,
       },
-      handlePageBeneficiarios: (page) => console.log(`Ir para página: ${page}`),
+      onPageChange: (page) => console.log(`Ir para página: ${page}`),
     },
   },
 };

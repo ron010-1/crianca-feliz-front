@@ -16,12 +16,3 @@
   align-items: center;
   gap: 8px;
 }
-
-.page-now {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #aaa;
-}
