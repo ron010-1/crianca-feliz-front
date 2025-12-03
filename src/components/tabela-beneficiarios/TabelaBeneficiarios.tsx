@@ -58,6 +58,7 @@ const TabelaBeneficiarios = ({ beneficiarios, paginationDetails, loading = false
                     <div className="actions-table">
                       <FaMapLocationDot
                         className="icon-actions icon-map"
+                        role= "button"
                         title="Acessar localização"
                         onClick={() => handleOpenMapModal(row)}
                       />
@@ -65,6 +66,7 @@ const TabelaBeneficiarios = ({ beneficiarios, paginationDetails, loading = false
                       <MdDelete
                         className="icon-actions icon-delete"
                         title="Deletar beneficiario"
+                        role= "button"
                         onClick={handleOpenExcludeModal}
                       />
                     </div>
