@@ -22,3 +22,9 @@
 .buttonWrapper {
   width: 100%;
 }
+.error {
+  color: #e53935;
+  font-size: 0.9rem;
+  margin-top: -6px;
+  margin-bottom: 10px;
+}
