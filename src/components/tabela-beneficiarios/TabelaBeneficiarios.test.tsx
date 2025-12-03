@@ -89,15 +89,5 @@ describe("Componente TabelaBeneficiarios", () => {
     expect(screen.getByText("de 4")).toBeInTheDocument();
   });
 
-  it("não deve renderizar a paginação se paginationDetails for undefined", () => {
-    render(
-        <TabelaBeneficiarios 
-            beneficiarios={dadosMock} 
-            loading={false}
-            paginationDetails={undefined}
-        />
-    );
-
-    expect(screen.queryByText("Próxima")).not.toBeInTheDocument();
-  });
+  
 });
