@@ -26,6 +26,7 @@
   align-items: center;
   background: #dbeafe;
   padding: 15px;
+  border-bottom: 1px solid #aaa;
 }
 
 .view-title-modal {

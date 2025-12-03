@@ -1,45 +1,105 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import TabelaBeneficiarios from "./TabelaBeneficiarios";
 import type { BeneficiarioType } from "../../models/beneficiario";
+import beneficarios from "../../mocks/beneficiarios.json";
 
-const sampleBeneficiarios: BeneficiarioType[] = [
-  {
-    id: 1,
-    name: "João Silva",
-    responsavel: "Maria Silva",
-    dataNascimento: "2005-03-20",
-    location: [-23.55, -46.63],
-    telefone1: "(11) 99999-9999",
-  },
-  {
-    id: 2,
-    name: "Ana Souza",
-    responsavel: "Carlos Souza",
-    dataNascimento: "2010-01-15",
-    location: [-22.90, -43.20],
-    telefone1: "(21) 98888-7777",
-    telefone2: "(21) 33333-3333",
-  },
-];
+const mockBeneficiarios: BeneficiarioType[] = beneficarios;
 
 const meta: Meta<typeof TabelaBeneficiarios> = {
   title: "Components/TabelaBeneficiarios",
   component: TabelaBeneficiarios,
   args: {
-    beneficiarios: sampleBeneficiarios,
+    loading: false,
+    beneficiarios: mockBeneficiarios.slice(0, 10),
+    paginationDetails: {
+      pagination: {
+        page: 1,
+        limit: 10,
+        totalItens: mockBeneficiarios.length,
+      },
+      handlePageBeneficiarios: (page) => alert(`Navegando para a página: ${page}`),
+    },
   },
   argTypes: {
+    loading: { control: "boolean" },
     beneficiarios: { control: "object" },
+    paginationDetails: { control: "object" },
   },
+  tags: ["autodocs"],
 };
 
 export default meta;
+
 type Story = StoryObj<typeof TabelaBeneficiarios>;
 
-export const Default: Story = {};
-
-export const Empty: Story = {
+/**
+ * Estado padrão: Exibe a tabela com dados e paginação (página inicial).
+ */
+export const Default: Story = {
   args: {
+    beneficiarios: mockBeneficiarios.slice(0, 10),
+    paginationDetails: {
+      pagination: {
+        page: 1,
+        limit: 10,
+        totalItens: mockBeneficiarios.length,
+      },
+      handlePageBeneficiarios: (page) => console.log(`Ir para página: ${page}`),
+    },
+  },
+};
+
+/**
+ * Estado de Carregamento: Exibe o componente de `Loading`.
+ */
+export const LoadingState: Story = {
+  args: {
+    loading: true,
     beneficiarios: [],
+  },
+};
+
+/**
+ * Estado Vazio: Exibe o componente `Empty` quando não há dados.
+ */
+export const EmptyState: Story = {
+  args: {
+    loading: false,
+    beneficiarios: [],
+    paginationDetails: undefined,
+  },
+};
+
+/**
+ * Paginação no Meio: Simula a visualização de uma página intermediária.
+ */
+export const MiddlePage: Story = {
+  args: {
+    beneficiarios: mockBeneficiarios.slice(10, 20),
+    paginationDetails: {
+      pagination: {
+        page: 2,
+        limit: 10,
+        totalItens: 25,
+      },
+      handlePageBeneficiarios: (page) => console.log(`Ir para página: ${page}`),
+    },
+  },
+};
+
+/**
+ * Paginação Desativada: Quando o total de itens não justifica a paginação.
+ */
+export const PaginationDisabled: Story = {
+  args: {
+    beneficiarios: mockBeneficiarios.slice(0, 5),
+    paginationDetails: {
+      pagination: {
+        page: 1,
+        limit: 10,
+        totalItens: 5,
+      },
+      handlePageBeneficiarios: (page) => console.log(`Ir para página: ${page}`),
+    },
   },
 };

@@ -1,7 +1,7 @@
 import { MdOutlineClose } from "react-icons/md";
-import CustomViewMap from "../custom-map/CustomViewMap";
 import type { BeneficiarioType } from "../../models/beneficiario";
 import "./style.css";
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
 
 interface ViewMapModalProps {
   open: boolean;
@@ -12,18 +12,31 @@ interface ViewMapModalProps {
 const ViewMapModal = ({ open, onClose, beneficiario }: ViewMapModalProps) => {
   if (!open) return null;
 
+  const [latitude, longitude] = beneficiario.location;
+
   return (
     <div className="backdrop">
       <div className="view-modal">
         <div className="view-header-modal">
           <span className="view-title-modal">
-            Localizacao do beneficiário <strong>{beneficiario.name}</strong>
+            Localização do beneficiário(a) <strong>{beneficiario.name}</strong>
           </span>
           <MdOutlineClose onClick={onClose} className="icon-close" title="Fechar" />
         </div>
 
         <div className="view-content-modal">
-          <CustomViewMap center={beneficiario.location} />
+          <MapContainer
+            center={[latitude, longitude]}
+            zoom={13}
+            scrollWheelZoom={true}
+            style={{ width: "100%", height: "100%" }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={[latitude, longitude]}></Marker>
+          </MapContainer>
         </div>
       </div>
     </div>

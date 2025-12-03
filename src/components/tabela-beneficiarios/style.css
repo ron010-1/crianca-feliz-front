@@ -1,3 +1,9 @@
+.container-listagem {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .actions-table {
   display: flex;
   align-items: center;
@@ -24,4 +30,10 @@
 
 .icon-map {
   color: #3b82f6;
+}
+
+.section-pagination {
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 15px;
 }
