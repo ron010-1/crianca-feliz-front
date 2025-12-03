@@ -21,10 +21,10 @@ const ViewMapModal = ({ open, onClose, beneficiario }: ViewMapModalProps) => {
           <span className="view-title-modal">
             Localização do beneficiário(a) <strong>{beneficiario.name}</strong>
           </span>
-          <MdOutlineClose onClick={onClose} className="icon-close" title="Fechar" />
+          <MdOutlineClose onClick={onClose} className="icon-close" title="Fechar" role="button"/>
         </div>
 
-        <div className="view-content-modal">
+        <div className="view-content-modal" role="dialog">
           <MapContainer
             center={[latitude, longitude]}
             zoom={13}
