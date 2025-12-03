@@ -8,13 +8,13 @@ describe("Componente Pagination", () => {
 
   test("deve mostrar a paginação quando houver mais itens que o limite", () => {
     render(
-      <Pagination 
-        pagination={{ 
-            page: 1, 
-            limit: 5,
-            totalItens: 6
-        }} 
-        handleItens={mockHandleItens} 
+      <Pagination
+        pagination={{
+          page: 1,
+          limit: 5,
+          totalItens: 6,
+        }}
+        onPageChange={mockHandleItens}
       />
     );
 
@@ -25,13 +25,13 @@ describe("Componente Pagination", () => {
 
   test("não deve mostrar a paginação se tiver itens iguais ao limite", () => {
     render(
-      <Pagination 
-        pagination={{ 
-            page: 1, 
-            limit: 5, 
-            totalItens: 5
-        }} 
-        handleItens={mockHandleItens} 
+      <Pagination
+        pagination={{
+          page: 1,
+          limit: 5,
+          totalItens: 5,
+        }}
+        onPageChange={mockHandleItens}
       />
     );
 
@@ -40,35 +40,20 @@ describe("Componente Pagination", () => {
   });
 
   test("deve calcular e exibir o número correto de páginas totais", () => {
-    render(
-      <Pagination 
-        pagination={{ page: 1, limit: 10, totalItens: 25 }} 
-        handleItens={mockHandleItens} 
-      />
-    );
+    render(<Pagination pagination={{ page: 1, limit: 10, totalItens: 25 }} onPageChange={mockHandleItens} />);
 
-    expect(screen.getByText("de 3")).toBeInTheDocument();
+    expect(screen.getByText("1 de 3")).toBeInTheDocument();
   });
 
   test("deve desabilitar o botão Próxima quando estiver na última página", () => {
-    render(
-      <Pagination 
-        pagination={{ page: 3, limit: 10, totalItens: 25 }} 
-        handleItens={mockHandleItens} 
-      />
-    );
+    render(<Pagination pagination={{ page: 3, limit: 10, totalItens: 25 }} onPageChange={mockHandleItens} />);
 
     const btnProxima = screen.getByRole("button", { name: "Próxima" });
     expect(btnProxima).toBeDisabled();
   });
 
   test("deve chamar a função handleItens com a página anterior ao clicar em Anterior", async () => {
-    render(
-      <Pagination 
-        pagination={{ page: 2, limit: 10, totalItens: 25 }} 
-        handleItens={mockHandleItens} 
-      />
-    );
+    render(<Pagination pagination={{ page: 2, limit: 10, totalItens: 25 }} onPageChange={mockHandleItens} />);
 
     const btnAnterior = screen.getByRole("button", { name: "Anterior" });
     await userEvent.click(btnAnterior);
