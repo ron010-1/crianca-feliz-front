@@ -17,7 +17,7 @@ interface TabelaBeneficiarios {
   loading?: boolean;
   paginationDetails?: {
     pagination: PaginationType;
-    handlePageBeneficiarios: (page: number) => void;
+    onPageChange: (page: number) => void;
   };
 }
 
@@ -58,7 +58,7 @@ const TabelaBeneficiarios = ({ beneficiarios, paginationDetails, loading = false
                     <div className="actions-table">
                       <FaMapLocationDot
                         className="icon-actions icon-map"
-                        role= "button"
+                        role="button"
                         title="Acessar localização"
                         onClick={() => handleOpenMapModal(row)}
                       />
@@ -66,7 +66,7 @@ const TabelaBeneficiarios = ({ beneficiarios, paginationDetails, loading = false
                       <MdDelete
                         className="icon-actions icon-delete"
                         title="Deletar beneficiario"
-                        role= "button"
+                        role="button"
                         onClick={handleOpenExcludeModal}
                       />
                     </div>
@@ -78,10 +78,7 @@ const TabelaBeneficiarios = ({ beneficiarios, paginationDetails, loading = false
 
           {paginationDetails && (
             <div className="section-pagination">
-              <Pagination
-                pagination={paginationDetails.pagination}
-                handleItens={paginationDetails.handlePageBeneficiarios}
-              />
+              <Pagination pagination={paginationDetails.pagination} onPageChange={paginationDetails.onPageChange} />
             </div>
           )}
         </div>
