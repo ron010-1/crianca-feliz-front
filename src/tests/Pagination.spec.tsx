@@ -1,11 +1,12 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import Pagination from "./Pagination";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, test, expect, vi } from "vitest";
+import Pagination from "../components/pagination/Pagination";
 
 describe("Componente Pagination", () => {
   const mockHandleItens = vi.fn();
 
-  it("deve mostrar a paginação quando houver mais itens que o limite (ex: 6 itens, limite 5)", () => {
+  test("deve mostrar a paginação quando houver mais itens que o limite", () => {
     render(
       <Pagination 
         pagination={{ 
@@ -17,12 +18,12 @@ describe("Componente Pagination", () => {
       />
     );
 
-    const btnProxima = screen.getByText("Próxima");
+    const btnProxima = screen.getByRole("button", { name: "Próxima" });
     expect(btnProxima).toBeInTheDocument();
     expect(btnProxima).not.toBeDisabled();
   });
 
-  it("não deve mostrar a paginação se tiver exatamente 5 itens (limite)", () => {
+  test("não deve mostrar a paginação se tiver itens iguais ao limite", () => {
     render(
       <Pagination 
         pagination={{ 
@@ -34,11 +35,11 @@ describe("Componente Pagination", () => {
       />
     );
 
-    const btnProxima = screen.queryByText("Próxima");
+    const btnProxima = screen.queryByRole("button", { name: "Próxima" });
     expect(btnProxima).not.toBeInTheDocument();
   });
 
-  it("deve calcular e exibir o número correto de páginas totais", () => {
+  test("deve calcular e exibir o número correto de páginas totais", () => {
     render(
       <Pagination 
         pagination={{ page: 1, limit: 10, totalItens: 25 }} 
@@ -49,7 +50,7 @@ describe("Componente Pagination", () => {
     expect(screen.getByText("de 3")).toBeInTheDocument();
   });
 
-  it("deve desabilitar o botão Próxima quando estiver na última página", () => {
+  test("deve desabilitar o botão Próxima quando estiver na última página", () => {
     render(
       <Pagination 
         pagination={{ page: 3, limit: 10, totalItens: 25 }} 
@@ -57,11 +58,11 @@ describe("Componente Pagination", () => {
       />
     );
 
-    const btnProxima = screen.getByText("Próxima");
+    const btnProxima = screen.getByRole("button", { name: "Próxima" });
     expect(btnProxima).toBeDisabled();
   });
 
-  it("deve chamar a função handleItens com a página anterior ao clicar em Anterior", () => {
+  test("deve chamar a função handleItens com a página anterior ao clicar em Anterior", async () => {
     render(
       <Pagination 
         pagination={{ page: 2, limit: 10, totalItens: 25 }} 
@@ -69,8 +70,8 @@ describe("Componente Pagination", () => {
       />
     );
 
-    const btnAnterior = screen.getByText("Anterior");
-    fireEvent.click(btnAnterior);
+    const btnAnterior = screen.getByRole("button", { name: "Anterior" });
+    await userEvent.click(btnAnterior);
 
     expect(mockHandleItens).toHaveBeenCalledWith(1);
   });
