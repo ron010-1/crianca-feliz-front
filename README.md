@@ -1,4 +1,6 @@
 # Projeto React + Vite, Testes Unitários e Storybook
+Equipe: Gustavo Lopes, Jucie Avelino, Riquelme Oliveira, Alex Alcantara, Diego Leite, João Paulo Barbosa e Sergio Henrique 
+
 
 ### Obs: É necessário possuir o Node.js versão 20 ou superior na sua máquina! 
 
