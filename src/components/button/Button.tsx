@@ -1,7 +1,7 @@
 import "./style.css";
 
 type ButtonProps = {
-  label: string;
+  label: React.ReactNode;
   type?: "button" | "submit" | "reset";
   variant?: "primary" | "secondary" | "danger";
   disabled?: boolean;
@@ -21,6 +21,7 @@ export default function Button({
       className={`button ${variant}`}
       disabled={disabled}
       onClick={onClick}
+      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
     >
       {label}
     </button>

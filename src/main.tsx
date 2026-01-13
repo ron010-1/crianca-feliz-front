@@ -4,10 +4,15 @@ import "./index.css";
 import App from "./App.tsx";
 import LoginAdmin from "./pages/LoginAdmin/index.tsx";
 import "leaflet/dist/leaflet.css";
+import { BrowserRouter, Route, Routes } from "react-router";
 
 createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
   <StrictMode>
-    <App />
-    <LoginAdmin />
+    <Routes>
+      <Route path="/" element={<App />}/>
+      <Route path="/loginAdmin" element={<LoginAdmin/>}/>
+    </Routes>
   </StrictMode>
+  </BrowserRouter>
 );
