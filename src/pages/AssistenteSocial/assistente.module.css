@@ -1,0 +1,59 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #afd3f8; 
+}
+
+.mainContainer {
+    width: 100%;
+    max-width: 500px; 
+    background: white;
+    padding: 2.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin: 3rem auto; 
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #1f2937;
+    text-align: center;
+}
+
+
+.inputGroup {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+
+.error {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-left: 0.25rem;
+    font-weight: 500;
+}
+
+
+.apiErrorBox {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #b91c1c;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.buttonWrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+

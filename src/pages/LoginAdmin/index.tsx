@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import Input from "../../components/Input/Input";
 import Style from "./login.module.css";
 import Button from "../../components/button/Button";
@@ -16,10 +17,14 @@ interface ApiError {
 
 export default function LoginAdmin() {
   const navButtons = [
-    { label: 'Sobre', onClick: () => console.log('Sobre clicado'), variant: 'secondary' as const },
-    { label: 'Ajuda', onClick: () => console.log('Ajuda clicado'), variant: 'primary' as const },
-  ];
-  
+    { 
+      label: 'Sobre', 
+      onClick: () => window.open("https://cadunicobrasil.com.br/crianca-feliz-2025-como-funciona-e-quem/", "_blank"), 
+      variant: 'primary' as const 
+    }
+  ]
+
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string>("");
@@ -74,7 +79,7 @@ export default function LoginAdmin() {
       const loginData = data as LoginResponse;
       setToken(loginData.token);
       localStorage.setItem("token", loginData.token);
-      alert(`Login realizado! Token: ${loginData.token}`);
+      navigate("/");
       
     } catch (error: any) {
       setErrors(prev => ({ ...prev, api: error.message }));
