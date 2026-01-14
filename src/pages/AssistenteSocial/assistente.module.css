@@ -57,3 +57,22 @@
     justify-content: center;
 }
 
+.mainContainerList {
+    width: 100%;
+    max-width: 1000px; 
+    background: white;
+    padding: 2.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin: 3rem auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .headerList {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap; 
+      gap: 1rem;
+  }

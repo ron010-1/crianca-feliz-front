@@ -6,6 +6,7 @@ import LoginAdmin from "./pages/LoginAdmin/index.tsx";
 import "leaflet/dist/leaflet.css";
 import { BrowserRouter, Route, Routes } from "react-router";
 import FormAssistenteSocial from "./pages/AssistenteSocial/index.tsx";
+import ListAssistentes from "./pages/AssistenteSocial/listAssistentes.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -14,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/" element={<App />}/>
       <Route path="/login" element={<LoginAdmin/>}/>
       <Route path="/assistente" element={<FormAssistenteSocial/>}/>
+      <Route path="/assistente/view" element={<ListAssistentes/>}/>
     </Routes>
   </StrictMode>
   </BrowserRouter>
