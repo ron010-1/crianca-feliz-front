@@ -1,11 +1,11 @@
-import React from 'react';
-import './style.css';
-import Button from '../button/Button'; 
-
+import React from "react";
+import "./style.css";
+import Button from "../button/Button";
+import type { VariantType } from "../../models/global";
 export interface NavButtonConfig {
   label: string;
   onClick: () => void;
-  variant?: "primary" | "secondary" | "danger"; 
+  variant?: VariantType;
   disabled?: boolean;
 }
 
@@ -24,14 +24,14 @@ const Navbar: React.FC<NavbarProps> = ({ logoUrl, brandName, buttons }) => {
       </div>
 
       <div className="navbar-right">
-        {buttons?.slice(0, 2).map((btn, index) => (
-          <Button 
+        {buttons?.slice(0, 4).map((btn, index) => (
+          <Button
             key={index}
             label={btn.label}
             onClick={btn.onClick}
-            variant={btn.variant} 
+            variant={btn.variant}
             disabled={btn.disabled}
-            type="button" 
+            type="button"
           />
         ))}
       </div>
