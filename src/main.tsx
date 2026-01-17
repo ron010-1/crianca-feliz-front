@@ -7,16 +7,18 @@ import "leaflet/dist/leaflet.css";
 import { BrowserRouter, Route, Routes } from "react-router";
 import FormAssistenteSocial from "./pages/AssistenteSocial/index.tsx";
 import ListAssistentes from "./pages/AssistenteSocial/listAssistentes.tsx";
+import VisitasPage from "./pages/Visitas/index.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
-  <StrictMode>
-    <Routes>
-      <Route path="/" element={<App />}/>
-      <Route path="/login" element={<LoginAdmin/>}/>
-      <Route path="/assistente" element={<FormAssistenteSocial/>}/>
-      <Route path="/assistente/view" element={<ListAssistentes/>}/>
-    </Routes>
-  </StrictMode>
+    <StrictMode>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/login" element={<LoginAdmin />} />
+        <Route path="/assistente" element={<FormAssistenteSocial />} />
+        <Route path="/assistente/view" element={<ListAssistentes />} />
+        <Route path="/visitas" element={<VisitasPage />} />
+      </Routes>
+    </StrictMode>
   </BrowserRouter>
 );
