@@ -5,6 +5,8 @@ import ListAssistentes from "../pages/AssistenteSocial/listAssistentes";
 import Layout from "./layout/Layout";
 import ListagemBeneficiariosPage from "../pages/Beneficiario/Listagem/ListagemBeneficiarios";
 import { authConstants } from "../constants/auth.constants";
+import CadastroBeneficiarioPage from "../pages/Beneficiario/Formulario/CadastroBeneficiarioPage";
+import EditarBeneficiarioPage from "../pages/Beneficiario/Formulario/EditarBeneficiarioPage";
 
 const PrivateRoutes = () => {
   const token = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
@@ -28,6 +30,8 @@ const Router = () => {
             <Route path="/assistente" element={<FormAssistenteSocial />} />
             <Route path="/assistente/view" element={<ListAssistentes />} />
             <Route path="/beneficiarios" element={<ListagemBeneficiariosPage />} />
+            <Route path="/beneficiarios/cadastrar" element={<CadastroBeneficiarioPage />} />
+            <Route path="/beneficiarios/:id/editar" element={<EditarBeneficiarioPage />} />
           </Route>
 
           <Route element={<PublicRoutes />}>

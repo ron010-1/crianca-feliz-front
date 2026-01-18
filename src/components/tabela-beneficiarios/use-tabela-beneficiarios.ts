@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import type { BeneficiarioType } from "../../models/beneficiario";
 import { BeneficiarioRequests } from "../../api/beneficiario/beneficiarioRequests";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authConstants } from "../../constants/auth.constants";
+import type { PaginationType } from "../../models/global";
+import { beneficiarioConstants } from "../../constants/beneficiario.constants";
 
 export const useTabelaBeneficiarios = () => {
   const queryClient = useQueryClient();
@@ -11,6 +13,11 @@ export const useTabelaBeneficiarios = () => {
   const [openMapModal, setOpenMapModal] = useState<boolean>(false);
   const [beneficiario, setBeneficiario] = useState<BeneficiarioType | null>(null);
   const token = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
+  const [pagination, setPagination] = useState<PaginationType>({
+    page: 1,
+    limit: beneficiarioConstants.BENEFS_PER_PAGE,
+    totalItens: 0,
+  });
 
   const {
     data: beneficiariosData,
@@ -25,6 +32,21 @@ export const useTabelaBeneficiarios = () => {
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   });
+
+  const beneficiarios: BeneficiarioType[] = useMemo(() => {
+    if (beneficiariosData && beneficiariosData) {
+      const startIndex = (pagination.page - 1) * pagination.limit;
+      const endIndex = startIndex + pagination.limit;
+
+      return beneficiariosData.rows.slice(startIndex, endIndex) as BeneficiarioType[];
+    }
+
+    return [];
+  }, [pagination, beneficiariosData]);
+
+  const handlePageBeneficiarios = async (page: number) => {
+    setPagination((prev) => ({ ...prev, page }));
+  };
 
   const mutationDeleteBeneficiario = useMutation({
     mutationFn: async ({
@@ -89,5 +111,8 @@ export const useTabelaBeneficiarios = () => {
     isLoadingBeneficiarios,
     isSuccessBeneficiarios,
     mutationDeleteBeneficiario,
+    pagination,
+    beneficiarios,
+    handlePageBeneficiarios,
   };
 };

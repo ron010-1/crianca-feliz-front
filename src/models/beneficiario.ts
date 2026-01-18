@@ -17,3 +17,5 @@ export type GeoPoint = {
   type: string;
   coordinates: number[];
 };
+
+export type CreateBeneficiarioType = Omit<BeneficiarioType, "uuid" | "assistenteId" | "createdAt" | "updatedAt">;

@@ -8,7 +8,7 @@ interface ConfirmModalProps {
   onClose: () => void;
   onAction: () => void;
   loading?: boolean;
-  message?: ReactElement;
+  message?: ReactElement | string;
   type?: "info" | "danger";
 }
 

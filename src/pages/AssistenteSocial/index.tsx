@@ -136,24 +136,24 @@ export default function FormAssistenteSocial() {
         <h1 className={Style.title}>{isEditing ? "Editar assistente social" : "Cadastro de assistente social"}</h1>
 
         <div className={Style.inputGroup}>
-          <Input value={nome} onChange={setNome} placeholder="Nome*" type="text" />
+          <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome*" type="text" />
           {hasSubmitted && errors.nome && <p className={Style.error}>{errors.nome}</p>}
         </div>
 
         <div className={Style.inputGroup}>
-          <Input value={telefone} onChange={setTelefone} placeholder="Telefone*" type="number" />
+          <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="Telefone*" type="number" />
           {hasSubmitted && errors.telefone && <p className={Style.error}>{errors.telefone}</p>}
         </div>
 
         <div className={Style.inputGroup}>
-          <Input value={email} onChange={setEmail} placeholder="Email*" type="email" />
+          <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email*" type="email" />
           {hasSubmitted && errors.email && <p className={Style.error}>{errors.email}</p>}
         </div>
 
         <div className={Style.inputGroup}>
           <Input
             value={password}
-            onChange={setPassword}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder={isEditing ? "Nova Senha (deixe vazio para manter)" : "Senha*"}
             type="password"
           />

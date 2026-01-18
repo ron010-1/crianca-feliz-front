@@ -108,12 +108,17 @@ export default function LoginAdmin() {
             <h2 className={Style.formTitle}>Acesse sua conta</h2>
 
             <div className={Style.inputGroup}>
-              <Input value={email} onChange={setEmail} placeholder="Email*" type="email" />
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email*" type="email" />
               {hasSubmitted && errors.email && <p className={Style.error}>{errors.email}</p>}
             </div>
 
             <div className={Style.inputGroup}>
-              <Input value={password} onChange={setPassword} placeholder="Senha*" type="password" />
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Senha*"
+                type="password"
+              />
               {hasSubmitted && errors.password && <p className={Style.error}>{errors.password}</p>}
             </div>
 
