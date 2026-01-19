@@ -2,15 +2,15 @@ import { toast } from "react-toastify";
 import type { cadastrarBeneficiarioType } from "./schemaValidarForm";
 import { BeneficiarioRequests } from "../../../api/beneficiario/beneficiarioRequests";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { authConstants } from "../../../constants/auth.constants";
 import { useNavigate, useParams } from "react-router";
 import type { CreateBeneficiarioType } from "../../../models/beneficiario";
+import { useAppSelector } from "../../../hooks/useAppSelector";
 
 export const useEditBeneficiarioPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
-  const tokenSalvo = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
+  const tokenSalvo = useAppSelector((state) => state.auth.token);;
 
   const {
     data: beneficiarioData,

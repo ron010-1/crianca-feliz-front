@@ -3,13 +3,13 @@ import { BeneficiarioRequests } from "../../../api/beneficiario/beneficiarioRequ
 import type { cadastrarBeneficiarioType } from "./schemaValidarForm";
 import type { CreateBeneficiarioType } from "../../../models/beneficiario";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authConstants } from "../../../constants/auth.constants";
 import { useNavigate } from "react-router";
+import { useAppSelector } from "../../../hooks/useAppSelector";
 
 export const useCadastroBeneficiarioPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const tokenSalvo = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
+  const tokenSalvo = useAppSelector((state) => state.auth.token);;
 
   const mutationCadastrarBeneficiario = useMutation({
     mutationKey: ["create-beneficiario"],
