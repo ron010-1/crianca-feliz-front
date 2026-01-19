@@ -1,46 +1,25 @@
-import "./App.css";
 import { ToastContainer } from "react-toastify";
-import TabelaBeneficiarios from "./components/tabela-beneficiarios/TabelaBeneficiarios";
-import type { BeneficiarioType } from "./models/beneficiario";
-import beneficiarios from "./mocks/beneficiarios.json";
-import { useMemo, useState } from "react";
-import type { PaginationType } from "./models/global";
+import "./App.css";
+import Router from "./routes/Router";
+import { useAppDispatch } from "./hooks/useAppDispatch";
+import { useEffect } from "react";
+import { authConstants } from "./constants/auth.constants";
+import { setToken } from "./store/auth/authSlice";
 
 function App() {
-  const [pagination, setPagination] = useState<PaginationType>({
-    page: 1,
-    limit: 5,
-    totalItens: beneficiarios.length,
-  });
-  const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
 
-  const beneficiariosMock: BeneficiarioType[] = useMemo(() => {
-    const startIndex = (pagination.page - 1) * pagination.limit;
-    const endIndex = startIndex + pagination.limit;
-
-    return beneficiarios.slice(startIndex, endIndex) as BeneficiarioType[];
-  }, [pagination]);
-
-  const handlePageBeneficiarios = async (page: number) => {
-    setLoading(true);
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setLoading(false);
-        resolve();
-      }, 2000);
-    });
-    setPagination((prev) => ({ ...prev, page }));
-  };
+  useEffect(() => {
+    const token = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
+    if (token) {
+      dispatch(setToken(token));
+    }
+  }, [dispatch]);
 
   return (
     <>
       <ToastContainer theme="colored" />
-      <span>Hello World!</span>
-      <TabelaBeneficiarios
-        loading={loading}
-        beneficiarios={beneficiariosMock}
-        paginationDetails={{ pagination, onPageChange: handlePageBeneficiarios }}
-      />
+      <Router />
     </>
   );
 }

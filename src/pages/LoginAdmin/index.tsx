@@ -1,84 +1,135 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { setToken } from "../../store/auth/authSlice";
 import Input from "../../components/Input/Input";
 import Style from "./login.module.css";
 import Button from "../../components/button/Button";
+import Loading from "../../components/loading/Loading";
+
+interface LoginResponse {
+  token: string;
+}
+
+interface ApiError {
+  message?: string;
+  error?: string;
+}
 
 export default function LoginAdmin() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useAppDispatch();
+
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+    api: "",
   });
 
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    document.title = "Admin Login";
+    document.title = "Login - Criança Feliz";
   }, []);
 
   useEffect(() => {
-    validateForm();
+    if (hasSubmitted) validateForm();
   }, [email, password]);
 
   const validateForm = () => {
-    const newErrors = { email: "", password: "" };
-
-    if (!email.trim()) {
-      newErrors.email = "O email é obrigatório.";
-    } else if (!email.includes("@")) {
-      newErrors.email = "Digite um email válido.";
-    }
-
-    if (!password.trim()) {
-      newErrors.password = "A senha é obrigatória.";
-    } else if (!/[A-Z]/.test(password)) {
-      newErrors.password = "A senha deve conter ao menos 1 letra maiúscula.";
-    }
-
+    const newErrors = { email: "", password: "", api: "" };
+    if (!email.trim()) newErrors.email = "O email é obrigatório.";
+    if (!password.trim()) newErrors.password = "A senha é obrigatória.";
     setErrors(newErrors);
     return !newErrors.email && !newErrors.password;
   };
 
-  const clearInputs = () => {
-    setEmail("");
-    setPassword("");
-  };
-
-  const handleSubmit = () => {
-    if (validateForm()) {
-      alert("Login válido");
-      clearInputs();
+  const handleLogin = async () => {
+    setHasSubmitted(true);
+    if (!validateForm()) return;
+  
+    try {
+      setLoading(true);
+  
+      const response = await fetch(
+        "https://criancafeliz-pw1-production.up.railway.app/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
+  
+      const data: LoginResponse | ApiError = await response.json();
+  
+      if (!response.ok) {
+        const apiError = data as ApiError;
+        throw new Error(apiError.message || apiError.error || "Erro ao realizar login");
+      }
+  
+      const loginData = data as LoginResponse;
+  
+      dispatch(setToken(loginData.token));
+      navigate("/");
+  
+    } catch (error: any) {
+      setErrors((prev) => ({ ...prev, api: error.message }));
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isFormValid = email && password && !errors.email && !errors.password;
 
   return (
-    <div className={Style.forms}>
-      <Input
-        value={email}
-        onChange={(v) => setEmail(v)}
-        placeholder="Email"
-        type="email"
-      />
-      {errors.email && <p className={Style.error}>{errors.email}</p>}
+    <div className={Style.page}>
 
-      <Input
-        value={password}
-        placeholder="Senha"
-        type="password"
-        onChange={(v) => setPassword(v)}
-      />
-      {errors.password && <p className={Style.error}>{errors.password}</p>}
+      <main className={Style.mainContainer}>
+        <section className={Style.heroSection}>
+          <div className={Style.heroContent}>
+            <h1 className={Style.heroTitle}>Sistema de gerenciamento do programa criança feliz</h1>
+            <p className={Style.heroDescription}>
+              Conectando assistentes sociais dedicados a crianças que precisam de acompanhamento e cuidado.
+            </p>
+            <img src="/public/vite.svg" alt="Ilustração do sistema" className={Style.heroImage} />
+          </div>
+        </section>
 
-      <div className={Style.buttonWrapper}>
-        <Button
-          label="Entrar"
-          variant="primary"
-          type="button"
-          disabled={!isFormValid}
-          onClick={handleSubmit}
-        />
-      </div>
+        <section className={Style.formSection}>
+          <div className={Style.formsContainer}>
+            <h2 className={Style.formTitle}>Acesse sua conta</h2>
+
+            <div className={Style.inputGroup}>
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email*" type="email" />
+              {hasSubmitted && errors.email && <p className={Style.error}>{errors.email}</p>}
+            </div>
+
+            <div className={Style.inputGroup}>
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Senha*"
+                type="password"
+              />
+              {hasSubmitted && errors.password && <p className={Style.error}>{errors.password}</p>}
+            </div>
+
+            {errors.api && <div className={Style.apiErrorBox}>{errors.api}</div>}
+
+            <div className={Style.buttonWrapper}>
+              <Button
+                label={loading ? <Loading size="sm" message="Entrando..." /> : "Entrar"}
+                variant="primary"
+                type="button"
+                onClick={handleLogin}
+                disabled={loading}
+              />
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
