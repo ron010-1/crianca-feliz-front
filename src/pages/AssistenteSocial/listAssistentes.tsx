@@ -1,26 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import Navbar from "../../components/navbar/Navbar";
 import Button from "../../components/button/Button";
 import TabelaAssistentes, { type AssistenteType } from "../../components/tabela-assistentes/TabelaAssistentes";
 import Style from "./assistente.module.css"; 
+import { useAppSelector } from "../../hooks/useAppSelector";
 
 export default function ListAssistentes() {
   const navigate = useNavigate();
   const [assistentes, setAssistentes] = useState<AssistenteType[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const navButtons = [
-    { label: 'Sair', onClick: () => {
-        localStorage.removeItem("token");
-        navigate("/login");
-    }, variant: 'secondary' as const },
-  ];
-
   const fetchAssistentes = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
+    const token = useAppSelector((state) => state.auth.token);
     try {
       setLoading(true);
       const response = await fetch("https://criancafeliz-pw1-production.up.railway.app/assists", {
@@ -59,7 +50,12 @@ export default function ListAssistentes() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    const token = localStorage.getItem("token");
+    const token = useAppSelector((state) => state.auth.token);
+    useEffect(() => {
+      if (!token) {
+        navigate("/login");
+      }
+    }, [token, navigate]);
     
     try {
       const response = await fetch(`https://criancafeliz-pw1-production.up.railway.app/assists/${id}`, {
@@ -92,11 +88,6 @@ export default function ListAssistentes() {
 
   return (
     <div className={Style.page}>
-      <Navbar 
-        logoUrl="/vite.svg" 
-        brandName="SIGPCF" 
-        buttons={navButtons} 
-      />
       
       <main className={Style.mainContainerList}>
         

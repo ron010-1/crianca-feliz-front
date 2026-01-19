@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
+import { useAppSelector } from "../../hooks/useAppSelector";
 import Input from "../../components/Input/Input";
 import Button from "../../components/button/Button";
-import Navbar from "../../components/navbar/Navbar";
 import Style from "./assistente.module.css";
 import Loading from "../../components/loading/Loading";
 
+
 export default function FormAssistenteSocial() {
+  const token = useAppSelector((state) => state.auth.token);
   const navigate = useNavigate();
   const location = useLocation();
 
   const assistenteParaEditar = location.state?.assistente;
   const isEditing = !!assistenteParaEditar;
-
-  const navButtons = [{ label: "Voltar", onClick: () => navigate("/assistente"), variant: "secondary" as const }];
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,6 +36,12 @@ export default function FormAssistenteSocial() {
   }, [isEditing]);
 
   useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
+  useEffect(() => {
     if (assistenteParaEditar) {
       setNome(assistenteParaEditar.nome);
       setEmail(assistenteParaEditar.email);
@@ -43,12 +49,6 @@ export default function FormAssistenteSocial() {
     }
   }, [assistenteParaEditar]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    }
-  }, [navigate]);
 
   useEffect(() => {
     if (hasSubmitted) validateForm();
@@ -84,7 +84,6 @@ export default function FormAssistenteSocial() {
     setHasSubmitted(true);
     if (!validateForm()) return;
 
-    const token = localStorage.getItem("token");
     if (!token) {
       alert("Erro de autenticação: Você precisa fazer login novamente.");
       navigate("/login");
@@ -131,7 +130,6 @@ export default function FormAssistenteSocial() {
 
   return (
     <div className={Style.page}>
-      {/* <Navbar logoUrl="/vite.svg" brandName="SIGPCF" buttons={navButtons} /> */}
       <main className={Style.mainContainer}>
         <h1 className={Style.title}>{isEditing ? "Editar assistente social" : "Cadastro de assistente social"}</h1>
 

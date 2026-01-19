@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { setToken } from "../../store/auth/authSlice";
 import Input from "../../components/Input/Input";
 import Style from "./login.module.css";
 import Button from "../../components/button/Button";
-import Navbar from "../../components/navbar/Navbar";
 import Loading from "../../components/loading/Loading";
 
 interface LoginResponse {
@@ -16,18 +17,10 @@ interface ApiError {
 }
 
 export default function LoginAdmin() {
-  const navButtons = [
-    {
-      label: "Sobre",
-      onClick: () => window.open("https://cadunicobrasil.com.br/crianca-feliz-2025-como-funciona-e-quem/", "_blank"),
-      variant: "primary" as const,
-    },
-  ];
-
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState<string>("");
+  const dispatch = useAppDispatch();
 
   const [errors, setErrors] = useState({
     email: "",
@@ -57,26 +50,31 @@ export default function LoginAdmin() {
   const handleLogin = async () => {
     setHasSubmitted(true);
     if (!validateForm()) return;
-
+  
     try {
       setLoading(true);
-      const response = await fetch("https://criancafeliz-pw1-production.up.railway.app/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
+  
+      const response = await fetch(
+        "https://criancafeliz-pw1-production.up.railway.app/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
+  
+      const data: LoginResponse | ApiError = await response.json();
+  
       if (!response.ok) {
         const apiError = data as ApiError;
         throw new Error(apiError.message || apiError.error || "Erro ao realizar login");
       }
-
+  
       const loginData = data as LoginResponse;
-      setToken(loginData.token);
-      localStorage.setItem("token", loginData.token);
+  
+      dispatch(setToken(loginData.token));
       navigate("/");
+  
     } catch (error: any) {
       setErrors((prev) => ({ ...prev, api: error.message }));
     } finally {
@@ -84,13 +82,9 @@ export default function LoginAdmin() {
     }
   };
 
+
   return (
     <div className={Style.page}>
-      {/* <Navbar 
-        logoUrl="/vite.svg" 
-        brandName="SIGPCF" 
-        buttons={navButtons} 
-      /> */}
 
       <main className={Style.mainContainer}>
         <section className={Style.heroSection}>
