@@ -24,22 +24,26 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fee2e2;
   padding: 15px;
 }
 
+.type-info {
+  background: #afd3f8;
+  color: #15528f;
+}
+
+.type-danger {
+  background: #fecaca;
+  color: #991b1b;
+}
+
 .title-modal {
-  color: #dc2626;
+  font-weight: bold;
 }
 
 .icon-close {
   font-size: 20px;
-  color: gray;
   cursor: pointer;
-
-  &:hover {
-    color: #555555;
-  }
 }
 
 .content-modal {
@@ -68,9 +72,4 @@
 .btn-cancel {
   background: #e5e7eb;
   color: #374151;
-}
-
-.btn-exclude {
-  background: #ef4444;
-  color: #e5e7eb;
 }

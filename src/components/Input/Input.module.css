@@ -1,14 +1,27 @@
+.wrapper {
+  width: 100%;
+}
+
 .input {
   width: 100%;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-
+  font-family: "Nunito Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-radius: 8px;
   border: 1px solid #ccc;
   outline: none;
 
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.md {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.lg {
+  padding: 14px 18px;
+  font-size: 16px;
 }
 
 .input:focus {
@@ -18,4 +31,8 @@
 
 .input::placeholder {
   color: #999;
+}
+
+.label {
+  color: #374151;
 }

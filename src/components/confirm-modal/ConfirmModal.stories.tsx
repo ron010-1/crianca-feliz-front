@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import ExcludeModal from "./ExcludeModal";
+import ConfirmModal from "./ConfirmModal";
 
-const meta: Meta<typeof ExcludeModal> = {
+const meta: Meta<typeof ConfirmModal> = {
   title: "Components/ExcludeModal",
-  component: ExcludeModal,
+  component: ConfirmModal,
   parameters: {
     layout: "centered",
   },
   args: {
     open: true,
-    message: "Tem certeza que deseja excluir este item?",
+    message: <span>Tem certeza que deseja excluir este item?</span>,
     loading: false,
   },
   argTypes: {
@@ -29,7 +29,7 @@ const meta: Meta<typeof ExcludeModal> = {
       action: "closed",
       description: "Função chamada ao clicar em 'Cancelar' ou no ícone de fechar",
     },
-    onExclude: {
+    onAction: {
       action: "excluded",
       description: "Função chamada ao confirmar exclusão",
     },
@@ -38,7 +38,7 @@ const meta: Meta<typeof ExcludeModal> = {
 
 export default meta;
 
-type Story = StoryObj<typeof ExcludeModal>;
+type Story = StoryObj<typeof ConfirmModal>;
 
 /**
  * Template base — Comportamento padrão
@@ -50,7 +50,7 @@ export const Default: Story = {};
  */
 export const CustomMessage: Story = {
   args: {
-    message: "Deseja realmente excluir o usuário selecionado?",
+    message: <span>Deseja realmente excluir o usuário selecionado?</span>,
   },
 };
 
