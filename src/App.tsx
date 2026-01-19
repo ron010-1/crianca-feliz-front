@@ -1,22 +1,12 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router"; 
+import { ToastContainer } from "react-toastify";
 import "./App.css";
+import Router from "./routes/Router";
 
 function App() {
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  if (!token) return null;
-
   return (
     <>
-      <h1>Hello World!</h1>
+      <ToastContainer theme="colored" />
+      <Router />
     </>
   );
 }

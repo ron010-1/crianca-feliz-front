@@ -12,16 +12,16 @@ interface ViewMapModalProps {
 const ViewMapModal = ({ open, onClose, beneficiario }: ViewMapModalProps) => {
   if (!open) return null;
 
-  const [latitude, longitude] = beneficiario.location;
+  const [longitude, latitude] = beneficiario.location.coordinates;
 
   return (
     <div className="backdrop">
       <div className="view-modal">
         <div className="view-header-modal">
           <span className="view-title-modal">
-            Localização do beneficiário(a) <strong>{beneficiario.name}</strong>
+            Localização do beneficiário(a) <strong>{beneficiario.nome}</strong>
           </span>
-          <MdOutlineClose onClick={onClose} className="icon-close" title="Fechar" role="button"/>
+          <MdOutlineClose onClick={onClose} className="icon-close" title="Fechar" role="button" />
         </div>
 
         <div className="view-content-modal" role="dialog">

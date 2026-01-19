@@ -3,94 +3,117 @@ import CustomTable from "../custom-table/CustomTable";
 import { FaUserEdit } from "react-icons/fa";
 import { FaMapLocationDot } from "react-icons/fa6";
 import "./style.css";
-import ExcludeModal from "../exclude-modal/ExcludeModal";
+import ConfirmModal from "../confirm-modal/ConfirmModal";
 import { useTabelaBeneficiarios } from "./use-tabela-beneficiarios";
-import type { BeneficiarioType } from "../../models/beneficiario";
 import ViewMapModal from "../view-map-modal/ViewMapModal";
 import Pagination from "../pagination/Pagination";
-import type { PaginationType } from "../../models/global";
 import Loading from "../loading/Loading";
 import Empty from "../empty/Empty";
+import type { PaginationType } from "../../models/global";
+import type { BeneficiarioType } from "../../models/beneficiario";
+import { useMemo, useState } from "react";
+import { beneficiarioConstants } from "../../constants/beneficiario.constants";
 
-interface TabelaBeneficiarios {
-  beneficiarios: BeneficiarioType[];
-  loading?: boolean;
-  paginationDetails?: {
-    pagination: PaginationType;
-    onPageChange: (page: number) => void;
-  };
-}
-
-const TabelaBeneficiarios = ({ beneficiarios, paginationDetails, loading = false }: TabelaBeneficiarios) => {
+const TabelaBeneficiarios = () => {
   const {
     handleCloseExcludeModal,
     handleExclude,
     openExcludeModal,
-    loadingModal,
     handleOpenExcludeModal,
     handleOpenMapModal,
     handleCloseMapModal,
     openMapModal,
     beneficiario,
+    beneficiariosData,
+    isLoadingBeneficiarios,
+    isSuccessBeneficiarios,
+    mutationDeleteBeneficiario,
   } = useTabelaBeneficiarios();
 
-  if (loading) {
+  const [pagination, setPagination] = useState<PaginationType>({
+    page: 1,
+    limit: beneficiarioConstants.BENEFS_PER_PAGE,
+    totalItens: beneficiariosData?.count || 0,
+  });
+
+  const beneficiarios: BeneficiarioType[] = useMemo(() => {
+    if (beneficiariosData) {
+      const startIndex = (pagination.page - 1) * pagination.limit;
+      const endIndex = startIndex + pagination.limit;
+
+      return beneficiariosData.rows.slice(startIndex, endIndex) as BeneficiarioType[];
+    }
+
+    return [];
+  }, [pagination, beneficiariosData]);
+
+  const handlePageBeneficiarios = async (page: number) => {
+    setPagination((prev) => ({ ...prev, page }));
+  };
+
+  if (isLoadingBeneficiarios) {
     return <Loading />;
+  }
+
+  if (!isSuccessBeneficiarios || !beneficiariosData) {
+    return <p>Erro ao carregar beneficiários!</p>;
+  }
+
+  if (!beneficiarios.length) {
+    return <Empty />;
   }
 
   return (
     <div>
-      {beneficiarios.length ? (
-        <div className="container-listagem">
-          <CustomTable
-            data={beneficiarios}
-            columns={[
-              { name: "ID", accessor: (row) => row.id },
-              { name: "Nome", accessor: (row) => row.name },
-              { name: "Responsável", accessor: (row) => row.responsavel },
-              { name: "Data de Nascimento", accessor: (row) => row.dataNascimento },
-              { name: "Telefone 1", accessor: (row) => row.telefone1 },
-              { name: "Telefone 2", accessor: (row) => row.telefone2 },
-              {
-                name: "Ações",
-                accessor: (row) => {
-                  return (
-                    <div className="actions-table">
-                      <FaMapLocationDot
-                        className="icon-actions icon-map"
-                        role="button"
-                        title="Acessar localização"
-                        onClick={() => handleOpenMapModal(row)}
-                      />
-                      <FaUserEdit className="icon-actions icon-edit" title="Editar beneficiario" />
-                      <MdDelete
-                        className="icon-actions icon-delete"
-                        title="Deletar beneficiario"
-                        role="button"
-                        onClick={handleOpenExcludeModal}
-                      />
-                    </div>
-                  );
-                },
+      <div className="container-listagem">
+        <CustomTable
+          data={beneficiarios}
+          columns={[
+            { name: "Nome", accessor: (row) => row.nome },
+            { name: "Responsável", accessor: (row) => row.nome_responsavel },
+            { name: "Data de Nascimento", accessor: (row) => row.data_nascimento },
+            { name: "Telefone 1", accessor: (row) => row.phone1 },
+            { name: "Telefone 2", accessor: (row) => row.phone2 },
+            {
+              name: "Ações",
+              accessor: (row) => {
+                return (
+                  <div className="actions-table">
+                    <FaMapLocationDot
+                      className="icon-actions icon-map"
+                      role="button"
+                      title="Acessar localização"
+                      onClick={() => handleOpenMapModal(row)}
+                    />
+                    <FaUserEdit className="icon-actions icon-edit" title="Editar beneficiario" />
+                    <MdDelete
+                      className="icon-actions icon-delete"
+                      title="Deletar beneficiario"
+                      role="button"
+                      onClick={() => handleOpenExcludeModal(row)}
+                    />
+                  </div>
+                );
               },
-            ]}
-          />
+            },
+          ]}
+        />
 
-          {paginationDetails && (
-            <div className="section-pagination">
-              <Pagination pagination={paginationDetails.pagination} onPageChange={paginationDetails.onPageChange} />
-            </div>
-          )}
+        <div className="section-pagination">
+          <Pagination pagination={pagination} onPageChange={handlePageBeneficiarios} />
         </div>
-      ) : (
-        <Empty />
-      )}
+      </div>
 
-      <ExcludeModal
+      <ConfirmModal
+        message={
+          <span>
+            Deseja realmente excluir o beneficiário <strong>"{beneficiario?.nome}"</strong>?
+          </span>
+        }
         open={openExcludeModal}
         onClose={handleCloseExcludeModal}
-        onExclude={handleExclude}
-        loading={loadingModal}
+        onAction={handleExclude}
+        loading={mutationDeleteBeneficiario.isPending}
       />
       <ViewMapModal open={openMapModal} onClose={handleCloseMapModal} beneficiario={beneficiario!} />
     </div>

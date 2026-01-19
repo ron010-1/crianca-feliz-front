@@ -1,12 +1,54 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import type { BeneficiarioType } from "../../models/beneficiario";
+import { BeneficiarioRequests } from "../../api/beneficiario/beneficiarioRequests";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { authConstants } from "../../constants/auth.constants";
 
 export const useTabelaBeneficiarios = () => {
+  const queryClient = useQueryClient();
   const [openExcludeModal, setOpenExcludeModal] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [openMapModal, setOpenMapModal] = useState<boolean>(false);
   const [beneficiario, setBeneficiario] = useState<BeneficiarioType | null>(null);
+  const token = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
+
+  const {
+    data: beneficiariosData,
+    isLoading: isLoadingBeneficiarios,
+    isSuccess: isSuccessBeneficiarios,
+  } = useQuery({
+    queryKey: ["beneficiarios"],
+    queryFn: async () => {
+      return await BeneficiarioRequests.get(token!);
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  });
+
+  const mutationDeleteBeneficiario = useMutation({
+    mutationFn: async ({
+      beneficiarioParaDeletar,
+      tokenParaDeletarBeneficiario,
+    }: {
+      beneficiarioParaDeletar: BeneficiarioType;
+      tokenParaDeletarBeneficiario: string;
+    }) => {
+      return await BeneficiarioRequests.delete({
+        id: beneficiarioParaDeletar.uuid,
+        token: tokenParaDeletarBeneficiario,
+      });
+    },
+    mutationKey: ["deletar-beneficiario"],
+    onError: (_error, { beneficiarioParaDeletar }) => {
+      toast.error(`Erro ao deletar o beneficiário ${beneficiarioParaDeletar.nome}, tente novamente!`);
+    },
+    onSuccess: (_data, { beneficiarioParaDeletar }) => {
+      queryClient.invalidateQueries({ queryKey: ["beneficiarios"] });
+      toast.success(`Beneficiário ${beneficiarioParaDeletar.nome} deletado com sucesso!`);
+      handleCloseExcludeModal();
+    },
+  });
 
   const handleOpenMapModal = (beneficiario: BeneficiarioType) => {
     setBeneficiario(beneficiario);
@@ -14,29 +56,38 @@ export const useTabelaBeneficiarios = () => {
   };
   const handleCloseMapModal = () => setOpenMapModal(false);
 
-  const handleOpenExcludeModal = () => setOpenExcludeModal(true);
+  const handleOpenExcludeModal = (beneficiario: BeneficiarioType) => {
+    setBeneficiario(beneficiario);
+    setOpenExcludeModal(true);
+  };
   const handleCloseExcludeModal = () => setOpenExcludeModal(false);
 
   const handleExclude = async () => {
-    setLoading(true);
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setLoading(false);
-        resolve();
-      }, 2000);
-    });
+    if (beneficiario) {
+      mutationDeleteBeneficiario.mutate({
+        beneficiarioParaDeletar: beneficiario,
+        tokenParaDeletarBeneficiario: token!,
+      });
+
+      return;
+    }
+
+    toast.error("Ocorreu um erro inesperado ao tentar deletar o beneficiário, tente novamente!");
     handleCloseExcludeModal();
-    toast.success("Registro excluido com sucesso");
   };
+
   return {
     handleCloseExcludeModal,
     handleExclude,
     openExcludeModal,
-    loadingModal: loading,
     handleOpenExcludeModal,
     handleOpenMapModal,
     handleCloseMapModal,
     openMapModal,
     beneficiario,
+    beneficiariosData,
+    isLoadingBeneficiarios,
+    isSuccessBeneficiarios,
+    mutationDeleteBeneficiario,
   };
 };
