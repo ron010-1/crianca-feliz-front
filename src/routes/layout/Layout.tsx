@@ -24,7 +24,11 @@ const Layout = () => {
       <Outlet />
 
       <ConfirmModal
-        message={<span>Deseja realmente sair da aplicação?</span>}
+        message={
+          <span>
+            Deseja realmente <strong>sair da aplicação</strong>?
+          </span>
+        }
         open={openLogoutModal}
         onClose={handleCloseLogoutModal}
         onAction={handleLogout}

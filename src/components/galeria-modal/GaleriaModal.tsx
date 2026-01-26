@@ -18,7 +18,7 @@ const GaleriaModal = ({ open, onClose, fotos, titulo }: GaleriaModalProps) => {
           <span className="galeria-title">Fotos da Visita - {titulo}</span>
           <MdOutlineClose onClick={onClose} className="galeria-close-icon" />
         </div>
-        
+
         <div className="galeria-content">
           {fotos.length > 0 ? (
             fotos.map((foto, index) => (

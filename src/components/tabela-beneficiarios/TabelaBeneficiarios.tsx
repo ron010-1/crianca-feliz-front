@@ -9,12 +9,10 @@ import ViewMapModal from "../view-map-modal/ViewMapModal";
 import Pagination from "../pagination/Pagination";
 import Loading from "../loading/Loading";
 import Empty from "../empty/Empty";
-import type { PaginationType } from "../../models/global";
-import type { BeneficiarioType } from "../../models/beneficiario";
-import { useMemo, useState } from "react";
-import { beneficiarioConstants } from "../../constants/beneficiario.constants";
+import { useNavigate } from "react-router";
 
 const TabelaBeneficiarios = () => {
+  const navigate = useNavigate();
   const {
     handleCloseExcludeModal,
     handleExclude,
@@ -28,28 +26,10 @@ const TabelaBeneficiarios = () => {
     isLoadingBeneficiarios,
     isSuccessBeneficiarios,
     mutationDeleteBeneficiario,
+    pagination,
+    beneficiarios,
+    handlePageBeneficiarios,
   } = useTabelaBeneficiarios();
-
-  const [pagination, setPagination] = useState<PaginationType>({
-    page: 1,
-    limit: beneficiarioConstants.BENEFS_PER_PAGE,
-    totalItens: beneficiariosData?.count || 0,
-  });
-
-  const beneficiarios: BeneficiarioType[] = useMemo(() => {
-    if (beneficiariosData) {
-      const startIndex = (pagination.page - 1) * pagination.limit;
-      const endIndex = startIndex + pagination.limit;
-
-      return beneficiariosData.rows.slice(startIndex, endIndex) as BeneficiarioType[];
-    }
-
-    return [];
-  }, [pagination, beneficiariosData]);
-
-  const handlePageBeneficiarios = async (page: number) => {
-    setPagination((prev) => ({ ...prev, page }));
-  };
 
   if (isLoadingBeneficiarios) {
     return <Loading />;
@@ -85,7 +65,11 @@ const TabelaBeneficiarios = () => {
                       title="Acessar localização"
                       onClick={() => handleOpenMapModal(row)}
                     />
-                    <FaUserEdit className="icon-actions icon-edit" title="Editar beneficiario" />
+                    <FaUserEdit
+                      className="icon-actions icon-edit"
+                      title="Editar beneficiario"
+                      onClick={() => navigate(`/beneficiarios/${row.uuid}/editar`)}
+                    />
                     <MdDelete
                       className="icon-actions icon-delete"
                       title="Deletar beneficiario"
@@ -100,7 +84,10 @@ const TabelaBeneficiarios = () => {
         />
 
         <div className="section-pagination">
-          <Pagination pagination={pagination} onPageChange={handlePageBeneficiarios} />
+          <Pagination
+            pagination={{ ...pagination, totalItens: beneficiariosData.count }}
+            onPageChange={handlePageBeneficiarios}
+          />
         </div>
       </div>
 

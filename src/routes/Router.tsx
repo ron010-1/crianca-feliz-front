@@ -4,16 +4,18 @@ import FormAssistenteSocial from "../pages/AssistenteSocial";
 import ListAssistentes from "../pages/AssistenteSocial/listAssistentes";
 import Layout from "./layout/Layout";
 import ListagemBeneficiariosPage from "../pages/Beneficiario/Listagem/ListagemBeneficiarios";
+import CadastroBeneficiarioPage from "../pages/Beneficiario/Formulario/CadastroBeneficiarioPage";
+import EditarBeneficiarioPage from "../pages/Beneficiario/Formulario/EditarBeneficiarioPage";
 import VisitasPage from "../pages/Visitas";
-import { authConstants } from "../constants/auth.constants";
+import { useAppSelector } from "../hooks/useAppSelector";
 
 const PrivateRoutes = () => {
-  const token = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
+  const token = useAppSelector((state) => state.auth.token);
   return token ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 const PublicRoutes = () => {
-  const token = localStorage.getItem(authConstants.NAME_TOKEN_IN_STORAGE);
+  const token = useAppSelector((state) => state.auth.token);
   return !token ? <Outlet /> : <Navigate to="/" replace />;
 };
 
@@ -27,6 +29,8 @@ const Router = () => {
             <Route path="/assistente" element={<FormAssistenteSocial />} />
             <Route path="/assistente/view" element={<ListAssistentes />} />
             <Route path="/beneficiarios" element={<ListagemBeneficiariosPage />} />
+            <Route path="/beneficiarios/cadastrar" element={<CadastroBeneficiarioPage />} />
+            <Route path="/beneficiarios/:id/editar" element={<EditarBeneficiarioPage />} />
             <Route path="/visitas" element={<VisitasPage />} />
           </Route>
 
