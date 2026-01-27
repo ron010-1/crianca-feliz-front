@@ -48,6 +48,13 @@ const getBeneficiarioNome = (b: BeneficiarioType): string => {
   return String(anyB.nome ?? "");
 };
 
+const formatDateForDisplay = (value?: string) => {
+  if (!value) return "-";
+  const d = new Date(value.includes("T") ? value : `${value}T00:00:00.000Z`);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleDateString("pt-BR", { timeZone: "UTC" });
+};
+
 const TabelaVisitas = () => {
   const {
     visitas,
@@ -81,7 +88,6 @@ const TabelaVisitas = () => {
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const [previewFotos, setPreviewFotos] = useState<string[]>([]);
-  const [fotosDataUrls, setFotosDataUrls] = useState<string[]>([]);
 
   const {
     register,
@@ -103,6 +109,13 @@ const TabelaVisitas = () => {
 
   const beneficiarioIdSelecionado = useWatch({ control, name: "beneficiarioId" });
 
+  const getBeneficiarioNomeById = (beneficiarioId?: string) => {
+    if (!beneficiarioId) return "-";
+    const list = (beneficiariosLista || []) as BeneficiarioType[];
+    const found = list.find((b) => getBeneficiarioId(b) === String(beneficiarioId));
+    return found ? getBeneficiarioNome(found) : "-";
+  };
+
   useEffect(() => {
     if (!modalFormOpen) return;
 
@@ -114,9 +127,13 @@ const TabelaVisitas = () => {
         estimulo_familiar: visitaSelecionada.estimulo_familiar || "",
         evolucao: visitaSelecionada.evolucao || "",
       });
-      setSearchTerm(visitaSelecionada.beneficiarioNome || "");
+
+      setSearchTerm(
+        visitaSelecionada.beneficiarioNome ||
+          getBeneficiarioNomeById(visitaSelecionada.beneficiarioId)
+      );
+
       setPreviewFotos(visitaSelecionada.fotos || []);
-      setFotosDataUrls(visitaSelecionada.fotos || []);
     } else {
       reset({
         beneficiarioId: "",
@@ -125,9 +142,9 @@ const TabelaVisitas = () => {
         estimulo_familiar: "",
         evolucao: "",
       });
+
       setSearchTerm("");
       setPreviewFotos([]);
-      setFotosDataUrls([]);
     }
 
     setIsSearching(false);
@@ -158,7 +175,9 @@ const TabelaVisitas = () => {
 
   const visitasFiltradasTotal = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    return (visitas || []).filter((v) => (v.beneficiarioNome || "").toLowerCase().includes(q));
+    return (visitas || []).filter((v) =>
+      (v.beneficiarioNome || getBeneficiarioNomeById(v.beneficiarioId)).toLowerCase().includes(q)
+    );
   }, [visitas, busca]);
 
   useEffect(() => {
@@ -183,10 +202,8 @@ const TabelaVisitas = () => {
 
   const handleSelectBeneficiario = (beneficiario: BeneficiarioType) => {
     const id = getBeneficiarioId(beneficiario);
-    const nome = getBeneficiarioNome(beneficiario);
-
     setValue("beneficiarioId", id, { shouldValidate: true, shouldDirty: true });
-    setSearchTerm(nome);
+    setSearchTerm(getBeneficiarioNome(beneficiario));
     setIsSearching(false);
   };
 
@@ -197,42 +214,35 @@ const TabelaVisitas = () => {
     const dataUrls = await Promise.all(files.map(fileToDataUrl));
 
     setPreviewFotos((prev) => [...prev, ...dataUrls]);
-    setFotosDataUrls((prev) => [...prev, ...dataUrls]);
 
     e.target.value = "";
   };
 
   const removeFoto = (index: number) => {
     setPreviewFotos((prev) => prev.filter((_, i) => i !== index));
-    setFotosDataUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = (data: VisitaFormData) => {
-    const list = (beneficiariosLista || []) as BeneficiarioType[];
-    const beneficiarioSelecionado = list.find((b) => getBeneficiarioId(b) === String(data.beneficiarioId));
-
-    const beneficiarioNome =
-      beneficiarioSelecionado ? getBeneficiarioNome(beneficiarioSelecionado) : searchTerm || "Desconhecido";
-
     const payload: Omit<VisitaType, "id"> = {
       data: data.data,
       beneficiarioId: data.beneficiarioId,
-      beneficiarioNome,
+      beneficiarioNome: getBeneficiarioNomeById(data.beneficiarioId),
       evolucao: data.evolucao,
       acompanhamento_familiar: data.acompanhamento_familiar,
       estimulo_familiar: data.estimulo_familiar,
-      fotos: fotosDataUrls,
+      fotos: [],
     };
 
     handleSalvar(payload);
   };
 
   const columns = [
+    { name: "Data", accessor: (row: VisitaType) => formatDateForDisplay(row.data) },
     {
-      name: "Data",
-      accessor: (row: VisitaType) => new Date(row.data).toLocaleDateString("pt-BR", { timeZone: "UTC" }),
+      name: "Beneficiário",
+      accessor: (row: VisitaType) =>
+        row.beneficiarioNome || getBeneficiarioNomeById(row.beneficiarioId),
     },
-    { name: "Beneficiário", accessor: (row: VisitaType) => row.beneficiarioNome },
     { name: "Evolução", accessor: (row: VisitaType) => row.evolucao || "-" },
     { name: "Acompanhamento", accessor: (row: VisitaType) => row.acompanhamento_familiar || "-" },
     { name: "Estímulo", accessor: (row: VisitaType) => row.estimulo_familiar || "-" },
@@ -240,24 +250,9 @@ const TabelaVisitas = () => {
       name: "Ações",
       accessor: (row: VisitaType) => (
         <div className={Style.actionsTable}>
-          <FaCamera
-            className={`${Style.iconActions} ${Style.iconCamera}`}
-            title="Ver Fotos"
-            role="button"
-            onClick={() => handleVerFotos(row)}
-          />
-          <FaUserEdit
-            className={`${Style.iconActions} ${Style.iconEdit}`}
-            title="Editar visita"
-            role="button"
-            onClick={() => handleEditar(row)}
-          />
-          <MdDelete
-            className={`${Style.iconActions} ${Style.iconDelete}`}
-            title="Excluir visita"
-            role="button"
-            onClick={() => handleDeletarClick(row)}
-          />
+          <FaCamera className={`${Style.iconActions} ${Style.iconCamera}`} role="button" onClick={() => handleVerFotos(row)} />
+          <FaUserEdit className={`${Style.iconActions} ${Style.iconEdit}`} role="button" onClick={() => handleEditar(row)} />
+          <MdDelete className={`${Style.iconActions} ${Style.iconDelete}`} role="button" onClick={() => handleDeletarClick(row)} />
         </div>
       ),
     },
@@ -279,16 +274,12 @@ const TabelaVisitas = () => {
     <div className={Style.containerListagem}>
       <section className={Style.headerVisitas}>
         <h2>Visitas</h2>
-        <Button label="Nova Visita" variant="primary" onClick={handleNovo} title="Agendar nova visita" />
+        <Button label="Nova Visita" variant="primary" onClick={handleNovo} />
       </section>
 
       <div className={Style.filtersContainer}>
         <div className={Style.searchWrapper}>
-          <Input
-            placeholder="Buscar por beneficiário..."
-            value={busca}
-            onChange={(e) => setBusca((e.target as HTMLInputElement).value)}
-          />
+          <Input placeholder="Buscar por beneficiário..." value={busca} onChange={(e) => setBusca((e.target as HTMLInputElement).value)} />
         </div>
       </div>
 
@@ -308,7 +299,7 @@ const TabelaVisitas = () => {
           <div className={Style.modalContainer}>
             <div className={Style.modalHeader}>
               <h3 className={Style.modalTitle}>{visitaSelecionada ? "Editar Visita" : "Agendar Nova Visita"}</h3>
-              <MdOutlineClose onClick={() => setModalFormOpen(false)} className={Style.closeIcon} title="Fechar" />
+              <MdOutlineClose onClick={() => setModalFormOpen(false)} className={Style.closeIcon} />
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -373,43 +364,25 @@ const TabelaVisitas = () => {
 
                 <div className={Style.formGroup}>
                   <label className={Style.formLabel}>Acompanhamento Familiar</label>
-                  <textarea
-                    className={`${Style.formTextarea} ${errors.acompanhamento_familiar ? Style.inputError : ""}`}
-                    rows={2}
-                    placeholder="Descreva o acompanhamento familiar..."
-                    {...register("acompanhamento_familiar")}
-                  />
-                  {errors.acompanhamento_familiar?.message && (
-                    <span className={Style.errorText}>{errors.acompanhamento_familiar.message}</span>
-                  )}
+                  <textarea className={`${Style.formTextarea} ${errors.acompanhamento_familiar ? Style.inputError : ""}`} rows={2} {...register("acompanhamento_familiar")} />
+                  {errors.acompanhamento_familiar?.message && <span className={Style.errorText}>{errors.acompanhamento_familiar.message}</span>}
                 </div>
 
                 <div className={Style.formGroup}>
                   <label className={Style.formLabel}>Estímulo Familiar</label>
-                  <textarea
-                    className={`${Style.formTextarea} ${errors.estimulo_familiar ? Style.inputError : ""}`}
-                    rows={2}
-                    placeholder="Descreva o estímulo familiar..."
-                    {...register("estimulo_familiar")}
-                  />
-                  {errors.estimulo_familiar?.message && (
-                    <span className={Style.errorText}>{errors.estimulo_familiar.message}</span>
-                  )}
+                  <textarea className={`${Style.formTextarea} ${errors.estimulo_familiar ? Style.inputError : ""}`} rows={2} {...register("estimulo_familiar")} />
+                  {errors.estimulo_familiar?.message && <span className={Style.errorText}>{errors.estimulo_familiar.message}</span>}
                 </div>
 
                 <div className={Style.formGroup}>
                   <label className={Style.formLabel}>Evolução</label>
-                  <textarea
-                    className={`${Style.formTextarea} ${errors.evolucao ? Style.inputError : ""}`}
-                    rows={3}
-                    placeholder="Detalhes sobre a evolução..."
-                    {...register("evolucao")}
-                  />
+                  <textarea className={`${Style.formTextarea} ${errors.evolucao ? Style.inputError : ""}`} rows={3} {...register("evolucao")} />
                   {errors.evolucao?.message && <span className={Style.errorText}>{errors.evolucao.message}</span>}
                 </div>
 
                 <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>Fotos da Visita</label>
+                  <label className={Style.formLabel}>Fotos da Visita (prévia)</label>
+
                   <div>
                     <input
                       type="file"
@@ -460,7 +433,8 @@ const TabelaVisitas = () => {
         onAction={handleConfirmarDelecao}
         message={
           <span>
-            Tem certeza que deseja remover a visita de <strong>{visitaSelecionada?.beneficiarioNome}</strong>?
+            Tem certeza que deseja remover a visita de{" "}
+            <strong>{visitaSelecionada?.beneficiarioNome || getBeneficiarioNomeById(visitaSelecionada?.beneficiarioId)}</strong>?
           </span>
         }
         type="danger"
@@ -471,7 +445,7 @@ const TabelaVisitas = () => {
         open={modalGaleriaOpen}
         onClose={() => setModalGaleriaOpen(false)}
         fotos={visitaSelecionada?.fotos || []}
-        titulo={visitaSelecionada?.beneficiarioNome || ""}
+        titulo={visitaSelecionada?.beneficiarioNome || getBeneficiarioNomeById(visitaSelecionada?.beneficiarioId)}
       />
     </div>
   );

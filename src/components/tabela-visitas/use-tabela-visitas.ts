@@ -6,6 +6,11 @@ import { BeneficiarioRequests } from "../../api/beneficiario/beneficiarioRequest
 import type { VisitaType } from "../../models/visita";
 import { useAppSelector } from "../../hooks/useAppSelector";
 
+const getVisitaId = (visita: VisitaType): string | number | undefined => {
+  const anyV = visita as any;
+  return anyV.id ?? anyV.uuid ?? anyV._id ?? anyV.visitaId ?? anyV.visita_id;
+};
+
 export const useTabelaVisitas = () => {
   const queryClient = useQueryClient();
   const token = useAppSelector((state) => state.auth.token);
@@ -17,20 +22,16 @@ export const useTabelaVisitas = () => {
 
   const visitasQuery = useQuery({
     queryKey: ["visitas"],
-    queryFn: async () => {
-      return await VisitasRequests.get(token!);
-    },
+    queryFn: async () => await VisitasRequests.get(token!),
     enabled: !!token,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 10,
     gcTime: 1000 * 60 * 10,
   });
 
   const beneficiariosQuery = useQuery({
     queryKey: ["beneficiarios-lista"],
-    queryFn: async () => {
-      return await BeneficiarioRequests.get(token!);
-    },
+    queryFn: async () => await BeneficiarioRequests.get(token!),
     enabled: !!token,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
@@ -38,51 +39,45 @@ export const useTabelaVisitas = () => {
   });
 
   const visitas = useMemo(() => visitasQuery.data?.rows || [], [visitasQuery.data]);
-  const beneficiariosLista = useMemo(
-    () => beneficiariosQuery.data?.rows || [],
-    [beneficiariosQuery.data]
-  );
+  const beneficiariosLista = useMemo(() => beneficiariosQuery.data?.rows || [], [beneficiariosQuery.data]);
 
   const createVisitaMutation = useMutation({
     mutationKey: ["criar-visita"],
-    mutationFn: async (novaVisita: Omit<VisitaType, "id">) => {
+    mutationFn: async (novaVisita: Omit<VisitaType, "id" | "uuid" | "_id">) => {
       return await VisitasRequests.create(novaVisita, token!);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["visitas"] });
-      toast.success("Visita agendada com sucesso!");
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["visitas"] });
+      toast.success("Visita cadastrada com sucesso!");
       setModalFormOpen(false);
     },
     onError: (error: any) => {
-      const mensagem = error?.response?.data?.message || error?.message || "Erro ao agendar visita.";
+      const mensagem = error?.response?.data?.message || error?.message || "Erro ao cadastrar visita.";
       toast.error(mensagem);
     },
   });
 
   const updateVisitaMutation = useMutation({
     mutationKey: ["atualizar-visita"],
-    mutationFn: async (visitaAtualizada: Partial<VisitaType> & { id: number }) => {
-      return await VisitasRequests.update(visitaAtualizada, token!);
+    mutationFn: async (args: { id: string | number; visita: Omit<VisitaType, "id" | "uuid" | "_id"> }) => {
+      return await VisitasRequests.update(args.id, args.visita, token!);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["visitas"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["visitas"] });
       toast.success("Visita atualizada com sucesso!");
       setModalFormOpen(false);
     },
     onError: (error: any) => {
-      const mensagem =
-        error?.response?.data?.message || error?.message || "Erro ao atualizar visita.";
+      const mensagem = error?.response?.data?.message || error?.message || "Erro ao atualizar visita.";
       toast.error(mensagem);
     },
   });
 
   const deleteVisitaMutation = useMutation({
     mutationKey: ["deletar-visita"],
-    mutationFn: async (id: number) => {
-      return await VisitasRequests.delete({ id, token: token! });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["visitas"] });
+    mutationFn: async (id: string | number) => await VisitasRequests.delete(id, token!),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["visitas"] });
       toast.success("Visita removida com sucesso!");
       setModalDeleteOpen(false);
     },
@@ -98,11 +93,21 @@ export const useTabelaVisitas = () => {
   };
 
   const handleEditar = (visita: VisitaType) => {
+    const id = getVisitaId(visita);
+    if (id === undefined || id === null || String(id).trim() === "") {
+      toast.error("Esta visita não possui ID válido para edição.");
+      return;
+    }
     setVisitaSelecionada(visita);
     setModalFormOpen(true);
   };
 
   const handleDeletarClick = (visita: VisitaType) => {
+    const id = getVisitaId(visita);
+    if (id === undefined || id === null || String(id).trim() === "") {
+      toast.error("Esta visita não possui ID válido para exclusão.");
+      return;
+    }
     setVisitaSelecionada(visita);
     setModalDeleteOpen(true);
   };
@@ -112,14 +117,19 @@ export const useTabelaVisitas = () => {
     setModalGaleriaOpen(true);
   };
 
-  const handleSalvar = (dados: Omit<VisitaType, "id">) => {
+  const handleSalvar = (dados: Omit<VisitaType, "id" | "uuid" | "_id">) => {
     if (!dados.beneficiarioId) {
       toast.warning("Selecione um beneficiário.");
       return;
     }
 
     if (visitaSelecionada) {
-      updateVisitaMutation.mutate({ ...dados, id: visitaSelecionada.id });
+      const id = getVisitaId(visitaSelecionada);
+      if (id === undefined || id === null || String(id).trim() === "") {
+        toast.error("Visita selecionada sem ID válido para atualização.");
+        return;
+      }
+      updateVisitaMutation.mutate({ id, visita: dados });
       return;
     }
 
@@ -127,9 +137,15 @@ export const useTabelaVisitas = () => {
   };
 
   const handleConfirmarDelecao = () => {
-    if (visitaSelecionada) {
-      deleteVisitaMutation.mutate(visitaSelecionada.id);
+    if (!visitaSelecionada) return;
+
+    const id = getVisitaId(visitaSelecionada);
+    if (id === undefined || id === null || String(id).trim() === "") {
+      toast.error("Visita selecionada sem ID válido para exclusão.");
+      return;
     }
+
+    deleteVisitaMutation.mutate(id);
   };
 
   return {
