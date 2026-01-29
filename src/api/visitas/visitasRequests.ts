@@ -18,25 +18,6 @@ const normalizeDateToYmd = (value: any): string => {
   return "";
 };
 
-const getApiBaseUrl = () => {
-  const anyProvider = provider as any;
-  const base = anyProvider?.defaults?.baseURL;
-  return typeof base === "string" ? base.replace(/\/+$/, "") : "";
-};
-
-const normalizeImageUrl = (value: any): string => {
-  if (!value) return "";
-  const s = String(value);
-
-  if (s.startsWith("http://") || s.startsWith("https://")) return s;
-
-  const base = getApiBaseUrl();
-  if (!base) return s;
-
-  if (s.startsWith("/")) return `${base}${s}`;
-  return `${base}/${s}`;
-};
-
 const mapApiToVisita = (raw: ApiVisita): VisitaType => {
   const id = raw?.id ?? raw?.uuid ?? raw?._id ?? raw?.visitaId ?? raw?.visita_id;
 
@@ -52,9 +33,7 @@ const mapApiToVisita = (raw: ApiVisita): VisitaType => {
     raw?.imagens_urls ??
     [];
 
-  const fotos: string[] = Array.isArray(images)
-    ? images.map((x: any) => normalizeImageUrl(x)).filter(Boolean)
-    : [];
+  const fotos: string[] = Array.isArray(images) ? images.map((x: any) => String(x)).filter(Boolean) : [];
 
   const dateRaw =
     raw?.date ??
@@ -78,14 +57,21 @@ const mapApiToVisita = (raw: ApiVisita): VisitaType => {
   };
 };
 
-const buildPayload = (visita: Omit<VisitaType, "id" | "uuid" | "_id">) => {
+const buildPayload = (visita: Omit<VisitaType, "id">) => {
+  const date = normalizeDateToYmd(visita.data);
+  const images = Array.isArray(visita.fotos) ? visita.fotos.filter(Boolean) : [];
+
   return {
-    date: normalizeDateToYmd(visita.data),
-    images: visita.fotos || [],
+    beneficiarioId: visita.beneficiarioId,
+    data: date,
+    date,
     evolucao: visita.evolucao,
     acompanhamento_familiar: visita.acompanhamento_familiar,
     estimulo_familiar: visita.estimulo_familiar,
-    beneficiarioId: visita.beneficiarioId,
+    fotos: images,
+    imagens: images,
+    images,
+    photos: images,
   };
 };
 
@@ -103,10 +89,7 @@ export class VisitasRequests {
     };
   }
 
-  static async create(
-    visita: Omit<VisitaType, "id" | "uuid" | "_id">,
-    token: string
-  ): Promise<VisitaType> {
+  static async create(visita: Omit<VisitaType, "id">, token: string): Promise<VisitaType> {
     const payload = buildPayload(visita);
 
     const { data } = await provider.post<ApiVisita>(`/visitas`, payload, {
@@ -118,7 +101,7 @@ export class VisitasRequests {
 
   static async update(
     id: string | number,
-    visita: Omit<VisitaType, "id" | "uuid" | "_id">,
+    visita: Omit<VisitaType, "id">,
     token: string
   ): Promise<VisitaType | null> {
     if (id === undefined || id === null || String(id).trim() === "") {
@@ -127,13 +110,25 @@ export class VisitasRequests {
 
     const payload = buildPayload(visita);
 
-    const res = await provider.patch<ApiVisita>(`/visitas/${id}`, payload, {
-      headers: { Authorization: `Bearer ${token}` },
-      validateStatus: (status) => status >= 200 && status < 300,
-    });
-
-    if (!res.data) return null;
-    return mapApiToVisita(res.data);
+    try {
+      const res = await provider.patch<ApiVisita>(`/visitas/${id}`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+        validateStatus: (status) => status >= 200 && status < 300,
+      });
+      if (!res.data) return null;
+      return mapApiToVisita(res.data);
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 404 || status === 405) {
+        const res = await provider.put<ApiVisita>(`/visitas/${id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+          validateStatus: (s) => s >= 200 && s < 300,
+        });
+        if (!res.data) return null;
+        return mapApiToVisita(res.data);
+      }
+      throw err;
+    }
   }
 
   static async delete(id: string | number, token: string): Promise<void> {

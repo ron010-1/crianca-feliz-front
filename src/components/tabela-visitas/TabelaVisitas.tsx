@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FaCamera, FaUserEdit } from "react-icons/fa";
-import { MdCloudUpload, MdDelete, MdOutlineClose, MdSearch } from "react-icons/md";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FaCamera, FaUserEdit } from "react-icons/fa";
+import { MdCloudUpload, MdDelete, MdOutlineClose, MdSearch } from "react-icons/md";
+
+import Style from "./style.module.css";
 
 import Input from "../Input/Input";
 import Button from "../button/Button";
@@ -14,11 +16,12 @@ import Loading from "../loading/Loading";
 import Pagination from "../pagination/Pagination";
 import Empty from "../empty/Empty";
 
-import Style from "./style.module.css";
 import { useTabelaVisitas } from "./use-tabela-visitas";
 import type { VisitaType } from "../../models/visita";
 import type { PaginationType } from "../../models/global";
 import type { BeneficiarioType } from "../../models/beneficiario";
+
+import { uploadToCloudinary } from "../../api/uploads/cloudinaryUpload";
 
 const visitaSchema = z.object({
   beneficiarioId: z.string().min(1, "O beneficiário é obrigatório."),
@@ -50,9 +53,16 @@ const getBeneficiarioNome = (b: BeneficiarioType): string => {
 
 const formatDateForDisplay = (value?: string) => {
   if (!value) return "-";
-  const d = new Date(value.includes("T") ? value : `${value}T00:00:00.000Z`);
-  if (Number.isNaN(d.getTime())) return "-";
-  return d.toLocaleDateString("pt-BR", { timeZone: "UTC" });
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y, m, d] = value.split("-");
+    return `${d}/${m}/${y}`;
+  }
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return "-";
+  const d = String(dt.getDate()).padStart(2, "0");
+  const m = String(dt.getMonth() + 1).padStart(2, "0");
+  const y = dt.getFullYear();
+  return `${d}/${m}/${y}`;
 };
 
 const TabelaVisitas = () => {
@@ -88,13 +98,24 @@ const TabelaVisitas = () => {
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const [previewFotos, setPreviewFotos] = useState<string[]>([]);
+  const [urlsExistentes, setUrlsExistentes] = useState<string[]>([]);
+  const [novosArquivos, setNovosArquivos] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const getBeneficiarioDisplayNameById = (id?: string) => {
+    const raw = String(id || "").trim();
+    if (!raw) return "-";
+    const list = (beneficiariosLista || []) as BeneficiarioType[];
+    const found = list.find((b) => getBeneficiarioId(b) === raw);
+    const nome = found ? getBeneficiarioNome(found) : "";
+    return nome && nome.trim() ? nome : "-";
+  };
 
   const {
     register,
     handleSubmit,
-    setValue,
     reset,
-    control,
+    setValue,
     formState: { errors },
   } = useForm<VisitaFormData>({
     resolver: zodResolver(visitaSchema),
@@ -107,48 +128,40 @@ const TabelaVisitas = () => {
     },
   });
 
-  const beneficiarioIdSelecionado = useWatch({ control, name: "beneficiarioId" });
-
-  const getBeneficiarioNomeById = (beneficiarioId?: string) => {
-    if (!beneficiarioId) return "-";
-    const list = (beneficiariosLista || []) as BeneficiarioType[];
-    const found = list.find((b) => getBeneficiarioId(b) === String(beneficiarioId));
-    return found ? getBeneficiarioNome(found) : "-";
-  };
-
   useEffect(() => {
-    if (!modalFormOpen) return;
+    if (modalFormOpen) {
+      if (visitaSelecionada) {
+        setValue("beneficiarioId", visitaSelecionada.beneficiarioId || "");
+        setValue("data", visitaSelecionada.data || "");
+        setValue("acompanhamento_familiar", visitaSelecionada.acompanhamento_familiar || "");
+        setValue("estimulo_familiar", visitaSelecionada.estimulo_familiar || "");
+        setValue("evolucao", visitaSelecionada.evolucao || "");
 
-    if (visitaSelecionada) {
-      reset({
-        beneficiarioId: String(visitaSelecionada.beneficiarioId || ""),
-        data: visitaSelecionada.data || "",
-        acompanhamento_familiar: visitaSelecionada.acompanhamento_familiar || "",
-        estimulo_familiar: visitaSelecionada.estimulo_familiar || "",
-        evolucao: visitaSelecionada.evolucao || "",
-      });
-
-      setSearchTerm(
-        visitaSelecionada.beneficiarioNome ||
-          getBeneficiarioNomeById(visitaSelecionada.beneficiarioId)
-      );
-
-      setPreviewFotos(visitaSelecionada.fotos || []);
-    } else {
-      reset({
-        beneficiarioId: "",
-        data: "",
-        acompanhamento_familiar: "",
-        estimulo_familiar: "",
-        evolucao: "",
-      });
-
-      setSearchTerm("");
-      setPreviewFotos([]);
+        const existentes = (visitaSelecionada.fotos || []).filter(Boolean);
+        setUrlsExistentes(existentes);
+        setPreviewFotos(existentes);
+        setNovosArquivos([]);
+        setSearchTerm(
+          (visitaSelecionada.beneficiarioNome || getBeneficiarioDisplayNameById(visitaSelecionada.beneficiarioId)) === "-"
+            ? ""
+            : (visitaSelecionada.beneficiarioNome || getBeneficiarioDisplayNameById(visitaSelecionada.beneficiarioId))
+        );
+      } else {
+        reset({
+          beneficiarioId: "",
+          data: "",
+          acompanhamento_familiar: "",
+          estimulo_familiar: "",
+          evolucao: "",
+        });
+        setSearchTerm("");
+        setUrlsExistentes([]);
+        setPreviewFotos([]);
+        setNovosArquivos([]);
+      }
+      setIsSearching(false);
     }
-
-    setIsSearching(false);
-  }, [modalFormOpen, visitaSelecionada, reset]);
+  }, [modalFormOpen, visitaSelecionada, reset, setValue]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -156,7 +169,6 @@ const TabelaVisitas = () => {
         setIsSearching(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -164,21 +176,19 @@ const TabelaVisitas = () => {
   useEffect(() => {
     const list = (beneficiariosLista || []) as BeneficiarioType[];
     const term = searchTerm.trim().toLowerCase();
-
     if (!term) {
       setFilteredBeneficiarios(list);
       return;
     }
-
     setFilteredBeneficiarios(list.filter((b) => getBeneficiarioNome(b).toLowerCase().includes(term)));
   }, [searchTerm, beneficiariosLista]);
 
   const visitasFiltradasTotal = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    return (visitas || []).filter((v) =>
-      (v.beneficiarioNome || getBeneficiarioNomeById(v.beneficiarioId)).toLowerCase().includes(q)
+    return (visitas || []).filter((v: VisitaType) =>
+      (v.beneficiarioNome || getBeneficiarioDisplayNameById(v.beneficiarioId)).toLowerCase().includes(q)
     );
-  }, [visitas, busca]);
+  }, [visitas, busca, beneficiariosLista]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -190,11 +200,14 @@ const TabelaVisitas = () => {
     return visitasFiltradasTotal.slice(startIndex, endIndex);
   }, [visitasFiltradasTotal, currentPage]);
 
-  const paginationInfo: PaginationType = {
-    page: currentPage,
-    limit: ITEMS_PER_PAGE,
-    totalItens: visitasFiltradasTotal.length,
-  };
+  const paginationInfo: PaginationType = useMemo(
+    () => ({
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+      totalItens: visitasFiltradasTotal.length,
+    }),
+    [currentPage, visitasFiltradasTotal.length]
+  );
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -209,64 +222,111 @@ const TabelaVisitas = () => {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
-
     const files = Array.from(e.target.files);
     const dataUrls = await Promise.all(files.map(fileToDataUrl));
-
+    setNovosArquivos((prev) => [...prev, ...files]);
     setPreviewFotos((prev) => [...prev, ...dataUrls]);
-
     e.target.value = "";
   };
 
   const removeFoto = (index: number) => {
     setPreviewFotos((prev) => prev.filter((_, i) => i !== index));
+    const existentesCount = urlsExistentes.length;
+    if (index < existentesCount) {
+      setUrlsExistentes((prev) => prev.filter((_, i) => i !== index));
+      return;
+    }
+    const fileIndex = index - existentesCount;
+    setNovosArquivos((prev) => prev.filter((_, i) => i !== fileIndex));
   };
 
-  const onSubmit = (data: VisitaFormData) => {
-    const payload: Omit<VisitaType, "id"> = {
-      data: data.data,
-      beneficiarioId: data.beneficiarioId,
-      beneficiarioNome: getBeneficiarioNomeById(data.beneficiarioId),
-      evolucao: data.evolucao,
-      acompanhamento_familiar: data.acompanhamento_familiar,
-      estimulo_familiar: data.estimulo_familiar,
-      fotos: [],
-    };
+  const onSubmit = async (values: VisitaFormData) => {
+    try {
+      setIsUploading(true);
+      const urlsNovas = await Promise.all(novosArquivos.map((f) => uploadToCloudinary(f)));
+      const imagens = [...urlsExistentes, ...urlsNovas].filter(Boolean);
 
-    handleSalvar(payload);
+      const payload: Partial<VisitaType> = {
+        beneficiarioId: values.beneficiarioId,
+        data: values.data,
+        acompanhamento_familiar: values.acompanhamento_familiar,
+        estimulo_familiar: values.estimulo_familiar,
+        evolucao: values.evolucao,
+        fotos: imagens,
+      };
+
+      await handleSalvar(payload);
+      setModalFormOpen(false);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const columns = [
-    { name: "Data", accessor: (row: VisitaType) => formatDateForDisplay(row.data) },
-    {
-      name: "Beneficiário",
-      accessor: (row: VisitaType) =>
-        row.beneficiarioNome || getBeneficiarioNomeById(row.beneficiarioId),
-    },
-    { name: "Evolução", accessor: (row: VisitaType) => row.evolucao || "-" },
-    { name: "Acompanhamento", accessor: (row: VisitaType) => row.acompanhamento_familiar || "-" },
-    { name: "Estímulo", accessor: (row: VisitaType) => row.estimulo_familiar || "-" },
-    {
-      name: "Ações",
-      accessor: (row: VisitaType) => (
-        <div className={Style.actionsTable}>
-          <FaCamera className={`${Style.iconActions} ${Style.iconCamera}`} role="button" onClick={() => handleVerFotos(row)} />
-          <FaUserEdit className={`${Style.iconActions} ${Style.iconEdit}`} role="button" onClick={() => handleEditar(row)} />
-          <MdDelete className={`${Style.iconActions} ${Style.iconDelete}`} role="button" onClick={() => handleDeletarClick(row)} />
-        </div>
-      ),
-    },
-  ];
+  const columns = useMemo(
+    () => [
+      {
+        name: "Data",
+        accessor: (row: VisitaType) => formatDateForDisplay(row.data),
+      },
+      {
+        name: "Beneficiário",
+        accessor: (row: VisitaType) => row.beneficiarioNome || getBeneficiarioDisplayNameById(row.beneficiarioId),
+      },
+      {
+        name: "Evolução",
+        accessor: (row: VisitaType) => row.evolucao,
+      },
+      {
+        name: "Acompanhamento",
+        accessor: (row: VisitaType) => row.acompanhamento_familiar,
+      },
+      {
+        name: "Estímulo",
+        accessor: (row: VisitaType) => row.estimulo_familiar,
+      },
+      {
+        name: "Ações",
+        accessor: (row: VisitaType) => (
+          <div className={Style.actionsTable}>
+            <FaCamera
+              className={`${Style.iconActions} ${Style.iconCamera}`}
+              role="button"
+              title="Ver fotos"
+              onClick={() => handleVerFotos(row)}
+            />
+            <FaUserEdit
+              className={`${Style.iconActions} ${Style.iconEdit}`}
+              title="Editar visita"
+              role="button"
+              onClick={() => handleEditar(row)}
+            />
+            <MdDelete
+              className={`${Style.iconActions} ${Style.iconDelete}`}
+              title="Deletar visita"
+              role="button"
+              onClick={() => handleDeletarClick(row)}
+            />
+          </div>
+        ),
+      },
+    ],
+    [beneficiariosLista]
+  );
+
+  const tituloGaleria = useMemo(() => {
+    const t =
+      visitaSelecionada?.beneficiarioNome ||
+      getBeneficiarioDisplayNameById(visitaSelecionada?.beneficiarioId) ||
+      "-";
+    const clean = String(t || "").trim();
+    return clean ? clean : "-";
+  }, [visitaSelecionada, beneficiariosLista]);
 
   if (isLoadingVisitas) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", padding: "4rem", width: "100%" }}>
-        <Loading message="Carregando visitas..." size="lg" />
-      </div>
-    );
+    return <Loading />;
   }
 
-  if (!isSuccessVisitas && !isLoadingVisitas) {
+  if (!isSuccessVisitas) {
     return <p>Erro ao carregar visitas!</p>;
   }
 
@@ -279,132 +339,112 @@ const TabelaVisitas = () => {
 
       <div className={Style.filtersContainer}>
         <div className={Style.searchWrapper}>
-          <Input placeholder="Buscar por beneficiário..." value={busca} onChange={(e) => setBusca((e.target as HTMLInputElement).value)} />
+          <Input
+            placeholder="Buscar por beneficiário..."
+            value={busca}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBusca(e.target.value)}
+          />
+          <MdSearch className={Style.searchIcon} />
         </div>
       </div>
 
-      {visitas.length === 0 ? (
+      {visitasFiltradasTotal.length === 0 ? (
         <Empty />
       ) : (
         <>
-          <CustomTable columns={columns} data={visitasPaginadas} />
-          <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
+          <CustomTable data={visitasPaginadas} columns={columns} />
+          <div className={Style.sectionPagination}>
             <Pagination pagination={paginationInfo} onPageChange={handlePageChange} />
           </div>
         </>
       )}
 
       {modalFormOpen && (
-        <div className={Style.backdrop}>
-          <div className={Style.modalContainer}>
+        <div className={Style.backdrop} onClick={() => setModalFormOpen(false)}>
+          <div className={Style.modalContainer} onClick={(e) => e.stopPropagation()}>
             <div className={Style.modalHeader}>
-              <h3 className={Style.modalTitle}>{visitaSelecionada ? "Editar Visita" : "Agendar Nova Visita"}</h3>
-              <MdOutlineClose onClick={() => setModalFormOpen(false)} className={Style.closeIcon} />
+              <span className={Style.modalTitle}>{visitaSelecionada ? "Editar Visita" : "Nova Visita"}</span>
+              <MdOutlineClose onClick={() => setModalFormOpen(false)} className={Style.iconClose} title="Fechar" role="button" />
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className={Style.modalBody}>
-                <div className={Style.formGroup} ref={searchContainerRef}>
-                  <label className={Style.formLabel}>Beneficiário</label>
-
-                  <div className={Style.searchInputWrapper}>
-                    <input
-                      type="text"
-                      className={`${Style.formInputSearch} ${errors.beneficiarioId ? Style.inputError : ""}`}
-                      placeholder="Pesquisar beneficiário..."
+                <div className={Style.field}>
+                  <label>Beneficiário</label>
+                  <div className={Style.searchBeneficiario} ref={searchContainerRef}>
+                    <Input
+                      placeholder="Buscar beneficiário..."
                       value={searchTerm}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setSearchTerm(e.target.value);
                         setIsSearching(true);
-                        if (e.target.value.trim() === "") {
-                          setValue("beneficiarioId", "", { shouldValidate: true, shouldDirty: true });
-                        }
                       }}
                       onFocus={() => setIsSearching(true)}
                     />
-                    <MdSearch className={Style.searchIcon} />
-                  </div>
-
-                  <input type="hidden" {...register("beneficiarioId")} />
-
-                  {errors.beneficiarioId?.message && (
-                    <span className={Style.errorText}>{errors.beneficiarioId.message}</span>
-                  )}
-
-                  {isSearching && (
-                    <div className={Style.searchResultsDropdown}>
-                      {filteredBeneficiarios.length > 0 ? (
-                        filteredBeneficiarios.map((b) => {
-                          const id = getBeneficiarioId(b);
-                          const selected = String(id) === String(beneficiarioIdSelecionado || "");
-                          return (
+                    {isSearching && (
+                      <div className={Style.dropdownBeneficiarios}>
+                        {filteredBeneficiarios.length ? (
+                          filteredBeneficiarios.map((b) => (
                             <div
-                              key={id}
-                              className={`${Style.searchResultItem} ${selected ? Style.selected : ""}`}
+                              key={getBeneficiarioId(b)}
+                              className={Style.dropdownItem}
                               onClick={() => handleSelectBeneficiario(b)}
+                              role="button"
                             >
                               {getBeneficiarioNome(b)}
                             </div>
-                          );
-                        })
-                      ) : (
-                        <div className={Style.searchResultEmpty}>Nenhum beneficiário encontrado</div>
-                      )}
-                    </div>
+                          ))
+                        ) : (
+                          <div className={Style.dropdownEmpty}>Nenhum beneficiário encontrado</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <input type="hidden" {...register("beneficiarioId")} />
+                  {errors.beneficiarioId && <span className={Style.errorText}>{errors.beneficiarioId.message}</span>}
+                </div>
+
+                <div className={Style.field}>
+                  <label>Data</label>
+                  <Input type="date" {...register("data")} />
+                  {errors.data && <span className={Style.errorText}>{errors.data.message}</span>}
+                </div>
+
+                <div className={Style.field}>
+                  <label>Evolução</label>
+                  <textarea className={Style.textarea} {...register("evolucao")} />
+                  {errors.evolucao && <span className={Style.errorText}>{errors.evolucao.message}</span>}
+                </div>
+
+                <div className={Style.field}>
+                  <label>Acompanhamento familiar</label>
+                  <textarea className={Style.textarea} {...register("acompanhamento_familiar")} />
+                  {errors.acompanhamento_familiar && (
+                    <span className={Style.errorText}>{errors.acompanhamento_familiar.message}</span>
                   )}
                 </div>
 
-                <div className={Style.formRow}>
-                  <div className={Style.formGroup}>
-                    <label className={Style.formLabel}>Data</label>
-                    <Input type="date" {...register("data")} />
-                    {errors.data?.message && <span className={Style.errorText}>{errors.data.message}</span>}
-                  </div>
+                <div className={Style.field}>
+                  <label>Estímulo familiar</label>
+                  <textarea className={Style.textarea} {...register("estimulo_familiar")} />
+                  {errors.estimulo_familiar && <span className={Style.errorText}>{errors.estimulo_familiar.message}</span>}
                 </div>
 
-                <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>Acompanhamento Familiar</label>
-                  <textarea className={`${Style.formTextarea} ${errors.acompanhamento_familiar ? Style.inputError : ""}`} rows={2} {...register("acompanhamento_familiar")} />
-                  {errors.acompanhamento_familiar?.message && <span className={Style.errorText}>{errors.acompanhamento_familiar.message}</span>}
-                </div>
-
-                <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>Estímulo Familiar</label>
-                  <textarea className={`${Style.formTextarea} ${errors.estimulo_familiar ? Style.inputError : ""}`} rows={2} {...register("estimulo_familiar")} />
-                  {errors.estimulo_familiar?.message && <span className={Style.errorText}>{errors.estimulo_familiar.message}</span>}
-                </div>
-
-                <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>Evolução</label>
-                  <textarea className={`${Style.formTextarea} ${errors.evolucao ? Style.inputError : ""}`} rows={3} {...register("evolucao")} />
-                  {errors.evolucao?.message && <span className={Style.errorText}>{errors.evolucao.message}</span>}
-                </div>
-
-                <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>Fotos da Visita (prévia)</label>
-
-                  <div>
-                    <input
-                      type="file"
-                      id="file-upload"
-                      multiple
-                      accept="image/png, image/jpeg, image/jpg"
-                      onChange={handleFileChange}
-                      className={Style.hiddenInput}
-                    />
-                    <label htmlFor="file-upload" className={Style.uploadLabel}>
-                      <MdCloudUpload size={24} />
-                      <span>Clique para adicionar fotos</span>
-                    </label>
-                  </div>
+                <div className={Style.field}>
+                  <label>Fotos da Visita</label>
+                  <label className={Style.uploadBox}>
+                    <MdCloudUpload size={28} />
+                    <span>Clique para adicionar fotos</span>
+                    <input type="file" accept="image/*" multiple onChange={handleFileChange} className={Style.fileInput} />
+                  </label>
 
                   {previewFotos.length > 0 && (
                     <div className={Style.previewContainer}>
-                      {previewFotos.map((foto, index) => (
-                        <div key={index} className={Style.previewItem}>
-                          <img src={foto} alt={`Preview ${index}`} />
-                          <button type="button" className={Style.removeBtn} onClick={() => removeFoto(index)}>
-                            <MdDelete />
+                      {previewFotos.map((src, idx) => (
+                        <div key={`${src}-${idx}`} className={Style.previewItem}>
+                          <img src={src} alt={`preview-${idx}`} />
+                          <button type="button" className={Style.removeBtn} onClick={() => removeFoto(idx)}>
+                            ×
                           </button>
                         </div>
                       ))}
@@ -416,10 +456,10 @@ const TabelaVisitas = () => {
               <div className={Style.modalFooter}>
                 <Button label="Cancelar" variant="secondary" onClick={() => setModalFormOpen(false)} />
                 <Button
-                  label={isSaving ? <Loading size="sm" withMessage={false} /> : "Salvar"}
+                  label={isUploading || isSaving ? <Loading size="sm" withMessage={false} /> : "Salvar"}
                   variant="primary"
                   type="submit"
-                  disabled={isSaving}
+                  disabled={isUploading || isSaving}
                 />
               </div>
             </form>
@@ -434,7 +474,12 @@ const TabelaVisitas = () => {
         message={
           <span>
             Tem certeza que deseja remover a visita de{" "}
-            <strong>{visitaSelecionada?.beneficiarioNome || getBeneficiarioNomeById(visitaSelecionada?.beneficiarioId)}</strong>?
+            <strong>
+              {visitaSelecionada?.beneficiarioNome ||
+                getBeneficiarioDisplayNameById(visitaSelecionada?.beneficiarioId) ||
+                "-"}
+            </strong>
+            ?
           </span>
         }
         type="danger"
@@ -445,7 +490,7 @@ const TabelaVisitas = () => {
         open={modalGaleriaOpen}
         onClose={() => setModalGaleriaOpen(false)}
         fotos={visitaSelecionada?.fotos || []}
-        titulo={visitaSelecionada?.beneficiarioNome || getBeneficiarioNomeById(visitaSelecionada?.beneficiarioId)}
+        titulo={tituloGaleria}
       />
     </div>
   );

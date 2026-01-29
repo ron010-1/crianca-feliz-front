@@ -35,6 +35,15 @@
 
 .searchWrapper {
   flex: 1;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
 }
 
 .actionsTable {
@@ -65,11 +74,15 @@
   color: #3b82f6;
 }
 
+.sectionPagination {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 50;
+  inset: 0;
+  z-index: 9999;
   width: 100%;
   height: 100vh;
   background: rgba(0, 0, 0, 0.3);
@@ -81,8 +94,8 @@
 
 .modalContainer {
   background: white;
-  width: 560px;
-  max-width: 90%;
+  width: 700px;
+  max-width: 95%;
   max-height: 90vh;
   overflow-y: auto;
   border-radius: 8px;
@@ -102,160 +115,100 @@
 }
 
 .modalTitle {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1e3a8a;
-  margin: 0;
+  font-weight: 600;
+  color: #0f172a;
 }
 
-.closeIcon {
+.iconClose {
   cursor: pointer;
-  color: #64748b;
-  font-size: 1.2rem;
-  transition: color 0.2s;
-}
-
-.closeIcon:hover {
-  color: #ef4444;
+  font-size: 22px;
 }
 
 .modalBody {
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 14px;
 }
 
-.formGroup {
+.field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  position: relative;
+  gap: 8px;
 }
 
-.formLabel {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-.formTextarea,
-.formInputSearch {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
+.textarea {
   width: 100%;
-  box-sizing: border-box;
+  min-height: 80px;
+  resize: vertical;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  outline: none;
 }
 
-.formTextarea:focus,
-.formInputSearch:focus {
-  border-color: #555ab9;
-  box-shadow: 0 0 0 2px rgba(85, 90, 185, 0.1);
+.textarea:focus {
+  border-color: #3b82f6;
 }
 
 .errorText {
   color: #ef4444;
-  font-size: 0.8rem;
-  margin-top: 2px;
+  font-size: 0.85rem;
 }
 
-.inputError {
-  border-color: #ef4444 !important;
-}
-
-.searchInputWrapper {
+.searchBeneficiario {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
-.searchIcon {
+.dropdownBeneficiarios {
   position: absolute;
-  right: 12px;
-  color: #9ca3af;
-  pointer-events: none;
-}
-
-.searchResultsDropdown {
-  position: absolute;
-  top: 100%;
+  top: 44px;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-top: 4px;
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  z-index: 60;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  z-index: 10;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
-.searchResultItem {
-  padding: 10px 14px;
+.dropdownItem {
+  padding: 10px 12px;
   cursor: pointer;
-  font-size: 14px;
-  color: #374151;
-  border-bottom: 1px solid #f3f4f6;
 }
 
-.searchResultItem:last-child {
-  border-bottom: none;
+.dropdownItem:hover {
+  background: #f8fafc;
 }
 
-.searchResultItem:hover {
-  background-color: #f9fafb;
+.dropdownEmpty {
+  padding: 10px 12px;
+  color: #64748b;
 }
 
-.selected {
-  background-color: #eff6ff;
-  color: #1e3a8a;
-  font-weight: 600;
-}
-
-.searchResultEmpty {
-  padding: 15px;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 14px;
-}
-
-.formRow {
-  display: flex;
-  gap: 15px;
-}
-
-.formRow > div {
-  flex: 1;
-}
-
-.hiddenInput {
-  display: none;
-}
-
-.uploadLabel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 20px;
+.uploadBox {
   border: 2px dashed #cbd5e1;
   border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  color: #64748b;
-  transition: all 0.2s;
+  color: #334155;
+  background: #f8fafc;
 }
 
-.uploadLabel:hover {
+.uploadBox:hover {
   border-color: #3b82f6;
   color: #3b82f6;
   background-color: #f8fafc;
+}
+
+.fileInput {
+  display: none;
 }
 
 .previewContainer {
