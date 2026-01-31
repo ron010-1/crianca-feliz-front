@@ -1,22 +1,36 @@
-import { useId, type InputHTMLAttributes } from "react";
-import style from "./Input.module.css";
+import { forwardRef } from "react";
+import type { ChangeEvent } from "react";
+import Style from "./Input.module.css";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  tamanho?: "md" | "lg";
+  tamanho?: "sm" | "md" | "lg";
+  onValueChange?: (value: string) => void;
 }
 
-export default function Input({ label, type = "text", tamanho = "md", className, ...props }: InputProps) {
-  const inputId = useId();
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, tamanho = "md", onValueChange, className, onChange, ...props }, ref) => {
+    const sizeClass = tamanho === "sm" ? Style.sm : tamanho === "lg" ? Style.lg : Style.md;
 
-  return (
-    <div className={style.wrapper}>
-      {label && (
-        <label className={style.label} htmlFor={inputId}>
-          {label}
-        </label>
-      )}
-      <input id={inputId} className={`${style.input} ${style[tamanho]} ${className || ""}`} type={type} {...props} />
-    </div>
-  );
-}
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+      onChange?.(e);
+      onValueChange?.(e.target.value);
+    };
+
+    return (
+      <div className={Style.container}>
+        {label ? <label className={Style.label}>{label}</label> : null}
+        <input
+          ref={ref}
+          {...props}
+          className={[Style.input, sizeClass, className].filter(Boolean).join(" ")}
+          onChange={handleChange}
+        />
+      </div>
+    );
+  }
+);
+
+Input.displayName = "Input";
+
+export default Input;

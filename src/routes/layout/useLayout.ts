@@ -13,6 +13,7 @@ export const useLayout = () => {
   const handleOpenLogoutModal = () => {
     setOpenLogoutModal(true);
   };
+
   const handleCloseLogoutModal = () => setOpenLogoutModal(false);
 
   const handleLogout = async () => {
@@ -28,7 +29,11 @@ export const useLayout = () => {
   const navButtonsNotLoggedIn: NavButtonConfig[] = [
     {
       label: "Sobre",
-      onClick: () => window.open("https://cadunicobrasil.com.br/crianca-feliz-2025-como-funciona-e-quem/", "_blank"),
+      onClick: () =>
+        window.open(
+          "https://cadunicobrasil.com.br/crianca-feliz-2025-como-funciona-e-quem/",
+          "_blank"
+        ),
       variant: "primary",
     },
   ];
@@ -48,6 +53,11 @@ export const useLayout = () => {
       label: "Beneficiário",
       onClick: () => navigate("/beneficiarios"),
       variant: variantForLocation("/beneficiarios"),
+    },
+    {
+      label: "Visitas",
+      onClick: () => navigate("/visitas"),
+      variant: variantForLocation("/visitas"),
     },
     {
       label: "Sair",

@@ -1,0 +1,275 @@
+.containerListagem {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 85%;
+  background: white;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  margin: 3rem auto;
+  border-radius: 8px;
+}
+
+.headerVisitas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerVisitas h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.filtersContainer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.searchWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+}
+
+.actionsTable {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.iconActions {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+}
+
+.iconActions:hover {
+  opacity: 0.7;
+}
+
+.iconDelete {
+  color: #ef4444;
+}
+
+.iconEdit {
+  color: #64748b;
+}
+
+.iconCamera {
+  color: #3b82f6;
+}
+
+.sectionPagination {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.modalContainer {
+  background: white;
+  width: 700px;
+  max-width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f0f9ff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modalTitle {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.iconClose {
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.modalBody {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: #3b82f6;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 0.85rem;
+}
+
+.searchBeneficiario {
+  position: relative;
+}
+
+.dropdownBeneficiarios {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  z-index: 10;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.dropdownItem {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.dropdownItem:hover {
+  background: #f8fafc;
+}
+
+.dropdownEmpty {
+  padding: 10px 12px;
+  color: #64748b;
+}
+
+.uploadBox {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #334155;
+  background: #f8fafc;
+}
+
+.uploadBox:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.fileInput {
+  display: none;
+}
+
+.previewContainer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.previewItem {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.previewItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.removeBtn:hover {
+  background: rgba(239, 68, 68, 0.9);
+}
+
+.modalFooter {
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background-color: #fafafa;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -2,6 +2,7 @@ import React from "react";
 import "./style.css";
 import Button from "../button/Button";
 import type { VariantType } from "../../models/global";
+
 export interface NavButtonConfig {
   label: string;
   onClick: () => void;
