@@ -2,9 +2,11 @@ import { useNavigate } from "react-router";
 import Button from "../../../components/button/Button";
 import TabelaBeneficiarios from "../../../components/tabela-beneficiarios/TabelaBeneficiarios";
 import Style from "./style.module.css";
+import { useIsOnline } from "../../../hooks/useIsOnline";
 
 const ListagemBeneficiariosPage = () => {
   const navigate = useNavigate();
+  const isOnline = useIsOnline();
 
   return (
     <div className={Style.page}>
@@ -14,8 +16,9 @@ const ListagemBeneficiariosPage = () => {
           <Button
             label="Cadastrar beneficiário"
             variant="primary"
-            title="Ir para cadastro de beneficiário"
-            onClick={() => navigate("/beneficiarios/cadastrar")}
+            title={isOnline ? "Ir para cadastro de beneficiário" : "Funcionalidade indisponível offline"}
+            onClick={() => isOnline && navigate("/beneficiarios/cadastrar")}
+            disabled={!isOnline}
           />
         </section>
 

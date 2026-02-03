@@ -92,6 +92,19 @@
   backdrop-filter: blur(2px);
 }
 
+.disabledActions {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.disabledUpload {
+  background-color: #f5f5f5;
+  border-color: #ccc !important;
+  color: #999;
+    cursor: not-allowed;
+}
+
 .modalContainer {
   background: white;
   width: 700px;

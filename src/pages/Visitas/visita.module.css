@@ -70,6 +70,16 @@
   gap: 1rem;
 }
 
+.actionsTable.disabledActions {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionsTable.disabledActions .iconActions {
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
 .iconActions {
   cursor: pointer;
   transition: all 0.2s ease;

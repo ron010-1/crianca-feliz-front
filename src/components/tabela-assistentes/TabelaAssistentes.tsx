@@ -8,6 +8,7 @@ import Pagination from "../pagination/Pagination";
 import Loading from "../loading/Loading";
 import Empty from "../empty/Empty";
 import type { PaginationType } from "../../models/global";
+import { useIsOnline } from "../../hooks/useIsOnline";
 
 export interface AssistenteType {
   id: string;
@@ -34,10 +35,12 @@ const TabelaAssistentes = ({
   onEdit,
   onDelete,
 }: TabelaAssistentesProps) => {
+  const isOnline = useIsOnline();
   const [assistenteParaExcluir, setAssistenteParaExcluir] = useState<AssistenteType | null>(null);
   const [loadingModal, setLoadingModal] = useState(false);
 
   const handleOpenExcludeModal = (assistente: AssistenteType) => {
+    if (!isOnline) return;
     setAssistenteParaExcluir(assistente);
   };
 
@@ -64,9 +67,16 @@ const TabelaAssistentes = ({
   }
 
   return (
-    <div>
+    <div className="wrapper-tabela">
+      {/* Banner de aviso quando offline */}
+      {!isOnline && (
+        <div className="offline-banner">
+          <span>Você está offline. As ações de edição e exclusão foram desativadas.</span>
+        </div>
+      )}
+
       {assistentes.length ? (
-        <div className="container-listagem">
+        <div className={`container-listagem ${!isOnline ? "is-offline" : ""}`}>
           <TabelaBeneficiarios
             data={assistentes}
             columns={[
@@ -77,19 +87,19 @@ const TabelaAssistentes = ({
                 name: "Ações",
                 accessor: (row) => {
                   return (
-                    <div className="actions-table">
+                    <div className={`actions-table ${!isOnline ? "disabled-actions" : ""}`}>
                       <FaUserEdit
                         className="icon-actions icon-edit"
-                        title="Editar assistente"
+                        title={isOnline ? "Editar assistente" : "Indisponível (Offline)"}
                         role="button"
-                        onClick={() => onEdit(row)}
+                        onClick={() => isOnline && onEdit(row)}
                       />
 
                       <MdDelete
                         className="icon-actions icon-delete"
-                        title="Deletar assistente"
+                        title={isOnline ? "Deletar assistente" : "Indisponível (Offline)"}
                         role="button"
-                        onClick={() => handleOpenExcludeModal(row)}
+                        onClick={() => isOnline && handleOpenExcludeModal(row)}
                       />
                     </div>
                   );
@@ -100,7 +110,10 @@ const TabelaAssistentes = ({
 
           {paginationDetails && (
             <div className="section-pagination">
-              <Pagination pagination={paginationDetails.pagination} onPageChange={paginationDetails.onPageChange} />
+              <Pagination 
+                pagination={paginationDetails.pagination} 
+                onPageChange={paginationDetails.onPageChange} 
+              />
             </div>
           )}
         </div>

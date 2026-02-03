@@ -10,6 +10,18 @@
   gap: 1rem;
 }
 
+.actions-table.disabled-actions {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions-table.disabled-actions .icon-actions {
+  /* Impede cliques e interações de hover */
+  pointer-events: none;
+  /* Opcional: deixa os ícones em tons de cinza */
+  filter: grayscale(1);
+}
+
 .icon-actions {
   cursor: pointer;
   transition: all 0.2s ease;

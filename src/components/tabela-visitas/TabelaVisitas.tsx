@@ -22,6 +22,7 @@ import type { PaginationType } from "../../models/global";
 import type { BeneficiarioType } from "../../models/beneficiario";
 
 import { uploadToCloudinary } from "../../api/uploads/cloudinaryUpload";
+import { useIsOnline } from "../../hooks/useIsOnline"; // Importação do seu hook
 
 const visitaSchema = z.object({
   beneficiarioId: z.string().min(1, "O beneficiário é obrigatório."),
@@ -66,6 +67,8 @@ const formatDateForDisplay = (value?: string) => {
 };
 
 const TabelaVisitas = () => {
+  const isOnline = useIsOnline(); // Instância do status de conexão
+  
   const {
     visitas,
     beneficiariosLista,
@@ -287,30 +290,30 @@ const TabelaVisitas = () => {
       {
         name: "Ações",
         accessor: (row: VisitaType) => (
-          <div className={Style.actionsTable}>
+          <div className={`${Style.actionsTable} ${!isOnline ? Style.disabledActions : ""}`}>
             <FaCamera
               className={`${Style.iconActions} ${Style.iconCamera}`}
               role="button"
-              title="Ver fotos"
-              onClick={() => handleVerFotos(row)}
+              title={isOnline ? "Ver fotos" : "Offline"}
+              onClick={() => isOnline && handleVerFotos(row)}
             />
             <FaUserEdit
               className={`${Style.iconActions} ${Style.iconEdit}`}
-              title="Editar visita"
+              title={isOnline ? "Editar visita" : "Offline"}
               role="button"
-              onClick={() => handleEditar(row)}
+              onClick={() => isOnline && handleEditar(row)}
             />
             <MdDelete
               className={`${Style.iconActions} ${Style.iconDelete}`}
-              title="Deletar visita"
+              title={isOnline ? "Deletar visita" : "Offline"}
               role="button"
-              onClick={() => handleDeletarClick(row)}
+              onClick={() => isOnline && handleDeletarClick(row)}
             />
           </div>
         ),
       },
     ],
-    [beneficiariosLista]
+    [beneficiariosLista, isOnline] // Dependência isOnline adicionada aqui
   );
 
   const tituloGaleria = useMemo(() => {
@@ -334,7 +337,13 @@ const TabelaVisitas = () => {
     <div className={Style.containerListagem}>
       <section className={Style.headerVisitas}>
         <h2>Visitas</h2>
-        <Button label="Nova Visita" variant="primary" onClick={handleNovo} />
+        <Button 
+          label="Nova Visita" 
+          variant="primary" 
+          onClick={handleNovo} 
+          disabled={!isOnline}
+          title={!isOnline ? "Funcionalidade indisponível offline" : ""}
+        />
       </section>
 
       <div className={Style.filtersContainer}>
@@ -432,10 +441,18 @@ const TabelaVisitas = () => {
 
                 <div className={Style.field}>
                   <label>Fotos da Visita</label>
-                  <label className={Style.uploadBox}>
+                  {/* Desabilita upload se estiver offline pois depende do Cloudinary */}
+                  <label className={`${Style.uploadBox} ${!isOnline ? Style.disabledUpload : ""}`}>
                     <MdCloudUpload size={28} />
-                    <span>Clique para adicionar fotos</span>
-                    <input type="file" accept="image/*" multiple onChange={handleFileChange} className={Style.fileInput} />
+                    <span>{isOnline ? "Clique para adicionar fotos" : "Upload indisponível (Offline)"}</span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      multiple 
+                      onChange={handleFileChange} 
+                      className={Style.fileInput} 
+                      disabled={!isOnline}
+                    />
                   </label>
 
                   {previewFotos.length > 0 && (
@@ -459,7 +476,7 @@ const TabelaVisitas = () => {
                   label={isUploading || isSaving ? <Loading size="sm" withMessage={false} /> : "Salvar"}
                   variant="primary"
                   type="submit"
-                  disabled={isUploading || isSaving}
+                  disabled={isUploading || isSaving || !isOnline}
                 />
               </div>
             </form>
