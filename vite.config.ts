@@ -16,6 +16,29 @@ export default defineConfig({
         type: 'module'
       },
 
+      manifest: {
+        name: 'Criança Feliz',
+        short_name: 'CriançaFeliz',
+        start_url: '/',
+        display: 'standalone',
+        background_color: '#ffffff',
+        theme_color: '#0d6efd',
+        icons: [
+          {
+            src: 'public/logo.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: "any maskable"
+          },
+          {
+            src: 'public/logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: "any maskable"
+          }
+        ]
+      },
+
       workbox: {
         navigateFallback: "/index.html",
 
