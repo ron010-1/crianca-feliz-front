@@ -4,13 +4,25 @@ import ConfirmModal from "../../components/confirm-modal/ConfirmModal";
 import { useLayout } from "./useLayout";
 
 const Layout = () => {
-  const { navButtonsLoggedIn, navButtonsNotLoggedIn, handleCloseLogoutModal, handleLogout, openLogoutModal, token } =
-    useLayout();
+  const { 
+    navButtonsLoggedIn, 
+    navButtonsNotLoggedIn, 
+    handleCloseLogoutModal, 
+    handleLogout, 
+    openLogoutModal, 
+    token 
+  } = useLayout();
 
   return (
     <>
-      <Navbar logoUrl="/logo.png" brandName="SIGPCF" buttons={token ? navButtonsLoggedIn : navButtonsNotLoggedIn} />
+      <Navbar 
+        logoUrl="/logo.png" 
+        brandName="SIGPCF" 
+        buttons={token ? navButtonsLoggedIn : navButtonsNotLoggedIn} 
+      />
+      
       <Outlet />
+
       <ConfirmModal
         message={
           <span>

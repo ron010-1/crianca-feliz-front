@@ -1,0 +1,117 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #afd3f8;
+}
+
+.mainContainer {
+  width: 100%;
+  max-width: 85%;
+  background: white;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  border-radius: 8px;
+}
+
+.headerVisitas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerVisitas h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.filtersContainer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.searchWrapper {
+  flex: 1;
+}
+
+.statusSelect {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  font-family: inherit;
+  font-size: 14px;
+  color: #555;
+  outline: none;
+  cursor: pointer;
+  min-width: 180px;
+  height: 42px;
+  transition: border-color 0.2s;
+}
+
+.statusSelect:focus {
+  border-color: #555ab9;
+  box-shadow: 0 0 0 2px rgba(85, 90, 185, 0.1);
+}
+
+.actionsTable {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.actionsTable.disabledActions {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionsTable.disabledActions .iconActions {
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
+.iconActions {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+}
+
+.iconActions:hover {
+  opacity: 0.7;
+}
+
+.iconDelete {
+  color: #ef4444;
+}
+
+.iconEdit {
+  color: #64748b;
+}
+
+.iconCamera {
+  color: #3b82f6;
+}
+
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.statusRealizada { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.statusAgendada { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.statusCancelada { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }

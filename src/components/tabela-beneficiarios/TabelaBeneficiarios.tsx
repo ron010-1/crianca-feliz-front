@@ -10,9 +10,12 @@ import Pagination from "../pagination/Pagination";
 import Loading from "../loading/Loading";
 import Empty from "../empty/Empty";
 import { useNavigate } from "react-router";
+import { useIsOnline } from "../../hooks/useIsOnline";
 
 const TabelaBeneficiarios = () => {
   const navigate = useNavigate();
+  const isOnline = useIsOnline();
+
   const {
     handleCloseExcludeModal,
     handleExclude,
@@ -58,23 +61,24 @@ const TabelaBeneficiarios = () => {
               name: "Ações",
               accessor: (row) => {
                 return (
-                  <div className="actions-table">
+
+                  <div className={`actions-table ${!isOnline ? "disabled-actions" : ""}`}>
                     <FaMapLocationDot
                       className="icon-actions icon-map"
                       role="button"
-                      title="Acessar localização"
-                      onClick={() => handleOpenMapModal(row)}
+                      title={isOnline ? "Acessar localização" : "Offline"}
+                      onClick={() => isOnline && handleOpenMapModal(row)}
                     />
                     <FaUserEdit
                       className="icon-actions icon-edit"
-                      title="Editar beneficiario"
-                      onClick={() => navigate(`/beneficiarios/${row.uuid}/editar`)}
+                      title={isOnline ? "Editar beneficiario" : "Offline"}
+                      onClick={() => isOnline && navigate(`/beneficiarios/${row.uuid}/editar`)}
                     />
                     <MdDelete
                       className="icon-actions icon-delete"
-                      title="Deletar beneficiario"
+                      title={isOnline ? "Deletar beneficiario" : "Offline"}
                       role="button"
-                      onClick={() => handleOpenExcludeModal(row)}
+                      onClick={() => isOnline && handleOpenExcludeModal(row)}
                     />
                   </div>
                 );
