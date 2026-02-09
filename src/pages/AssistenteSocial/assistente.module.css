@@ -57,6 +57,12 @@
     justify-content: center;
 }
 
+.buttonVoltar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
 .mainContainerList {
     width: 100%;
     max-width: 1000px; 

@@ -25,7 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({ logoUrl, brandName, buttons }) => {
       </div>
 
       <div className="navbar-right">
-        {buttons?.slice(0, 4).map((btn, index) => (
+        {buttons?.slice(0, 5).map((btn, index) => (
           <Button
             key={index}
             label={btn.label}
