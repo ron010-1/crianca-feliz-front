@@ -8,6 +8,7 @@ import CadastroBeneficiarioPage from "../pages/Beneficiario/Formulario/CadastroB
 import EditarBeneficiarioPage from "../pages/Beneficiario/Formulario/EditarBeneficiarioPage";
 import VisitasPage from "../pages/Visitas";
 import { useAppSelector } from "../hooks/useAppSelector";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 const PrivateRoutes = () => {
   const token = useAppSelector((state) => state.auth.token);
@@ -25,7 +26,7 @@ const Router = () => {
       <Routes>
         <Route element={<Layout />}>
           <Route element={<PrivateRoutes />}>
-            <Route path="/" element={<p>Hello World!</p>} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/assistente" element={<FormAssistenteSocial />} />
             <Route path="/assistente/view" element={<ListAssistentes />} />
             <Route path="/beneficiarios" element={<ListagemBeneficiariosPage />} />

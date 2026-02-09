@@ -131,6 +131,14 @@ export default function FormAssistenteSocial() {
   return (
     <div className={Style.page}>
       <main className={Style.mainContainer}>
+      <div className={Style.buttonVoltar}>
+        <Button
+          label="Voltar"
+          variant="primary"
+          title="Voltar para listagem de beneficiários"
+          onClick={() => navigate("/assistente/view")}
+        />
+      </div>
         <h1 className={Style.title}>{isEditing ? "Editar assistente social" : "Cadastro de assistente social"}</h1>
 
         <div className={Style.inputGroup}>
