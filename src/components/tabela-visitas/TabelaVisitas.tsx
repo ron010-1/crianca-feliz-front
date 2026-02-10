@@ -6,6 +6,7 @@ import { FaCamera, FaUserEdit } from "react-icons/fa";
 import { MdCloudUpload, MdDelete, MdOutlineClose, MdSearch } from "react-icons/md";
 
 import Style from "./style.module.css";
+import TabelaVisitasView from "./TabelaVisitasView";
 
 import Input from "../Input/Input";
 import Button from "../button/Button";
@@ -334,39 +335,29 @@ const TabelaVisitas = () => {
   }
 
   return (
-    <div className={Style.containerListagem}>
-      <section className={Style.headerVisitas}>
-        <h2>Visitas</h2>
-        <Button 
-          label="Nova Visita" 
-          variant="primary" 
-          onClick={handleNovo} 
-          disabled={!isOnline}
-          title={!isOnline ? "Funcionalidade indisponível offline" : ""}
-        />
-      </section>
-
-      <div className={Style.filtersContainer}>
-        <div className={Style.searchWrapper}>
-          <Input
-            placeholder="Buscar por beneficiário..."
-            value={busca}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBusca(e.target.value)}
-          />
-          <MdSearch className={Style.searchIcon} />
-        </div>
-      </div>
-
-      {visitasFiltradasTotal.length === 0 ? (
-        <Empty />
-      ) : (
-        <>
-          <CustomTable data={visitasPaginadas} columns={columns} />
-          <div className={Style.sectionPagination}>
-            <Pagination pagination={paginationInfo} onPageChange={handlePageChange} />
-          </div>
-        </>
-      )}
+    <>
+      <TabelaVisitasView
+        loading={isLoadingVisitas}
+        online={isOnline}
+        visitas={visitasPaginadas.map((v) => ({
+          ...v,
+          beneficiarioNome: v.beneficiarioNome || getBeneficiarioDisplayNameById(v.beneficiarioId),
+        }))}
+        paginationDetails={
+          visitasFiltradasTotal.length === 0
+            ? undefined
+            : {
+                pagination: paginationInfo,
+                onPageChange: handlePageChange,
+              }
+        }
+        busca={busca}
+        onBuscaChange={setBusca}
+        onNovo={handleNovo}
+        onVerFotos={handleVerFotos}
+        onEditar={handleEditar}
+        onDeletar={handleDeletarClick}
+      />
 
       {modalFormOpen && (
         <div className={Style.backdrop} onClick={() => setModalFormOpen(false)}>
@@ -441,16 +432,15 @@ const TabelaVisitas = () => {
 
                 <div className={Style.field}>
                   <label>Fotos da Visita</label>
-                  {/* Desabilita upload se estiver offline pois depende do Cloudinary */}
                   <label className={`${Style.uploadBox} ${!isOnline ? Style.disabledUpload : ""}`}>
                     <MdCloudUpload size={28} />
                     <span>{isOnline ? "Clique para adicionar fotos" : "Upload indisponível (Offline)"}</span>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      multiple 
-                      onChange={handleFileChange} 
-                      className={Style.fileInput} 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileChange}
+                      className={Style.fileInput}
                       disabled={!isOnline}
                     />
                   </label>
@@ -509,8 +499,8 @@ const TabelaVisitas = () => {
         fotos={visitaSelecionada?.fotos || []}
         titulo={tituloGaleria}
       />
-    </div>
+    </>
   );
-};
+}
 
 export default TabelaVisitas;
